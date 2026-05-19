@@ -1,0 +1,38 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    command: pnpm dev --hostname 0.0.0.0
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgres://personal_site:personal_site@db:5432/personal_site"
+      NEXT_TELEMETRY_DISABLED: "1"
+      PAYLOAD_SECRET: "local-payload-secret-change-me"
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - next_cache:/app/.next
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: personal_site
+      POSTGRES_PASSWORD: personal_site
+      POSTGRES_USER: personal_site
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U personal_site -d personal_site"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  node_modules:
+  next_cache:
+  postgres_data:
