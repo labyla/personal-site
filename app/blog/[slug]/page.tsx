@@ -70,33 +70,36 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <PublicSiteShell>
       <Header header={header} />
 
-      <article className="px-4 pt-32 pb-20">
-        <div className="mx-auto max-w-5xl">
+      <article className="px-4 pb-20 pt-32 md:pb-28">
+        <div className="mx-auto max-w-6xl">
           <Link
             href="/#blog"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to articles
           </Link>
 
-          <header className="mt-10">
-            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          <header className="mt-10 border-t border-border pt-8">
+            <div className="flex flex-wrap items-center gap-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <span>Article</span>
+              <span className="h-px w-8 bg-border" />
               {publishedAt && <time dateTime={post.publishedAt || undefined}>{publishedAt}</time>}
+              {publishedAt && post.readingTime && <span className="text-border">/</span>}
               {post.readingTime && <span>{post.readingTime}</span>}
             </div>
 
-            <h1 className="mt-6 max-w-4xl text-5xl font-bold leading-tight md:text-7xl">
+            <h1 className="mt-7 max-w-5xl text-[clamp(3.25rem,9vw,8rem)] font-bold uppercase leading-[0.88] tracking-normal">
               {post.title}
             </h1>
 
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground md:text-xl">
+            <p className="mt-8 max-w-3xl border-l border-border pl-5 text-base leading-8 text-muted-foreground md:text-lg">
               {post.excerpt}
             </p>
           </header>
 
           {post.coverImageUrl && (
-            <div className="relative mt-12 aspect-video overflow-hidden rounded-3xl border border-border bg-card">
+            <div className="relative mt-12 aspect-video overflow-hidden border border-border bg-card">
               <Image
                 src={post.coverImageUrl}
                 alt={post.title}
@@ -104,10 +107,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 className="object-cover"
                 priority
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/24 to-transparent" />
             </div>
           )}
 
-          <div className="mx-auto mt-14 max-w-3xl">
+          <div className="mx-auto mt-14 max-w-3xl border-t border-border pt-10">
             {post.content ? (
               <RichText data={post.content} />
             ) : (

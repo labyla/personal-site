@@ -70,34 +70,36 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     <PublicSiteShell>
       <Header header={header} />
 
-      <article className="px-4 pt-32 pb-20">
-        <div className="mx-auto max-w-5xl">
+      <article className="px-4 pb-20 pt-32 md:pb-28">
+        <div className="mx-auto max-w-6xl">
           <Link
             href="/#work"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to projects
           </Link>
 
-          <header className="mt-10">
-            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          <header className="mt-10 border-t border-border pt-8">
+            <div className="flex flex-wrap items-center gap-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <span>Project</span>
+              <span className="h-px w-8 bg-border" />
               {publishedAt && <time dateTime={project.publishedAt || undefined}>{publishedAt}</time>}
               {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground"
+                  className="border border-border px-2.5 py-1 text-[0.68rem] text-muted-foreground"
                 >
                   {tag}
                 </span>
               ))}
             </div>
 
-            <h1 className="mt-6 max-w-4xl text-5xl font-bold leading-tight md:text-7xl">
+            <h1 className="mt-7 max-w-5xl text-[clamp(3.25rem,9vw,8rem)] font-bold uppercase leading-[0.88] tracking-normal">
               {project.title}
             </h1>
 
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground md:text-xl">
+            <p className="mt-8 max-w-3xl border-l border-border pl-5 text-base leading-8 text-muted-foreground md:text-lg">
               {project.excerpt || project.description}
             </p>
 
@@ -106,7 +108,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 href={project.externalUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                className="mt-8 inline-flex items-center gap-2 border border-accent bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Visit project
                 <ExternalLink className="h-4 w-4" />
@@ -115,7 +117,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </header>
 
           {project.imageUrl && (
-            <div className="relative mt-12 aspect-video overflow-hidden rounded-3xl border border-border bg-card">
+            <div className="relative mt-12 aspect-video overflow-hidden border border-border bg-card">
               <Image
                 src={project.imageUrl}
                 alt={project.title}
@@ -123,10 +125,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 className="object-cover"
                 priority
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/24 to-transparent" />
             </div>
           )}
 
-          <div className="mx-auto mt-14 max-w-3xl">
+          <div className="mx-auto mt-14 max-w-3xl border-t border-border pt-10">
             {project.content ? (
               <RichText data={project.content} />
             ) : (

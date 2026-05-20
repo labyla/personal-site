@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 
 import type { BlogPostListItem } from "@/lib/data/posts"
@@ -45,26 +46,44 @@ export function Blog({ posts }: BlogProps) {
             >
               <Link
                 href={post.href}
-                className="group flex h-full flex-col border border-border bg-card/70 p-5 transition-colors hover:border-accent/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="group relative isolate flex h-full min-h-72 flex-col overflow-hidden border border-border bg-card/70 p-5 transition-colors hover:border-accent/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <div className="mb-8 flex items-center justify-between gap-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <div className="relative z-10 mb-8 flex items-center justify-between gap-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   <span>{String(index + 1).padStart(2, "0")}</span>
                   <span className="h-px flex-1 bg-border" />
                   {post.readTime && <span>{post.readTime}</span>}
                 </div>
 
-                <h3 className="mb-4 text-2xl font-bold uppercase leading-none text-foreground transition-colors group-hover:text-accent md:text-3xl">
+                {post.image && (
+                  <div
+                    aria-hidden="true"
+                    className="relative z-10 mb-6 max-h-72 translate-y-0 overflow-hidden border border-border opacity-100 transition-[max-height,opacity,transform,margin] duration-500 ease-out md:mb-0 md:max-h-0 md:-translate-y-4 md:opacity-0 md:duration-700 md:ease-[cubic-bezier(0.22,1,0.36,1)] md:group-hover:mb-6 md:group-hover:max-h-72 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-within:mb-6 md:group-focus-within:max-h-72 md:group-focus-within:translate-y-0 md:group-focus-within:opacity-100 md:group-focus-visible:mb-6 md:group-focus-visible:max-h-72 md:group-focus-visible:translate-y-0 md:group-focus-visible:opacity-100"
+                  >
+                    <div className="relative aspect-video">
+                      <Image
+                        src={post.image}
+                        alt=""
+                        fill
+                        sizes="(min-width: 768px) 33vw, 100vw"
+                        className="object-cover opacity-90 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 group-focus-within:scale-105 group-focus-visible:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-background/18" />
+                    </div>
+                  </div>
+                )}
+
+                <h3 className="relative z-10 mb-4 text-2xl font-bold uppercase leading-none text-foreground transition-colors group-hover:text-accent group-focus-visible:text-accent md:text-3xl">
                   {post.title}
                 </h3>
-                <p className="mb-8 line-clamp-3 text-sm leading-7 text-muted-foreground">
+                <p className="relative z-10 mb-8 line-clamp-3 text-sm leading-7 text-muted-foreground">
                   {post.excerpt}
                 </p>
 
-                <div className="mt-auto flex items-center justify-between border-t border-border pt-4 text-xs uppercase tracking-wider text-muted-foreground">
+                <div className="relative z-10 mt-auto flex items-center justify-between border-t border-border pt-4 text-xs uppercase tracking-wider text-muted-foreground">
                   <span>{post.date || "Article"}</span>
-                  <span className="inline-flex items-center gap-1 text-foreground transition-colors group-hover:text-accent">
+                  <span className="inline-flex items-center gap-1 text-foreground transition-colors group-hover:text-accent group-focus-visible:text-accent">
                     Read
-                    <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-focus-visible:translate-x-0.5 group-focus-visible:-translate-y-0.5" />
                   </span>
                 </div>
               </Link>

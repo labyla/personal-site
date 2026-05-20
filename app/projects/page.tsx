@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, ExternalLink } from "lucide-react"
+import { ArrowLeft, ArrowUpRight, ExternalLink } from "lucide-react"
 
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
@@ -21,72 +21,87 @@ export default async function ProjectsPage() {
     <PublicSiteShell>
       <Header header={header} />
 
-      <section className="px-4 pt-32 pb-20">
+      <section className="px-4 pb-20 pt-32 md:pb-28">
         <div className="mx-auto max-w-6xl">
           <Link
             href="/#work"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <ArrowLeft className="h-4 w-4" />
             Back home
           </Link>
 
-          <div className="mt-10 mb-14">
-            <p className="text-xs text-muted-foreground font-medium mb-4 uppercase tracking-wider">
+          <div className="mb-14 mt-10 border-t border-border pt-8">
+            <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
               PROJECTS
             </p>
-            <h1 className="text-5xl font-bold leading-tight md:text-7xl">
+            <h1 className="max-w-4xl text-[clamp(3.25rem,9vw,8rem)] font-bold uppercase leading-[0.88] tracking-normal">
               All projects
             </h1>
-            <p className="mt-6 max-w-2xl text-muted-foreground leading-8">
+            <p className="mt-8 max-w-2xl border-l border-border pl-5 leading-8 text-muted-foreground">
               A closer look at selected product, engineering, and interface work.
             </p>
           </div>
 
-          <div className="space-y-8">
-            {projects.map((project) => (
+          <div className="border-t border-border">
+            {projects.map((project, index) => (
               <Link
                 key={project.id}
                 href={project.href}
-                className="group block relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-accent/20 to-gradient-blue/10 p-1"
+                className="group block border-b border-border py-7 transition-colors hover:border-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:py-9"
               >
-                <div className="relative bg-card rounded-[22px] overflow-hidden">
-                  <div className="grid gap-6 p-6 md:grid-cols-2 md:p-8">
-                    <div className="flex flex-col justify-center">
-                      <h2 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-accent transition-colors">
-                        {project.title}
-                      </h2>
-                      <p className="text-muted-foreground mb-6">
-                        {project.description}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {project.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-3 py-1 bg-secondary text-xs rounded-full text-muted-foreground"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
+                <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_20rem] md:items-stretch">
+                  <div className="flex flex-col justify-center">
+                    <div className="mb-5 flex items-center gap-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <span className="h-px w-8 bg-border" />
+                      <span>{project.tags[0]}</span>
                     </div>
-                    <div className="relative aspect-video md:aspect-auto rounded-xl overflow-hidden">
+                    <h2 className="mb-4 text-3xl font-bold uppercase leading-none text-muted-foreground transition-colors group-hover:text-accent md:text-5xl">
+                      {project.title}
+                    </h2>
+                    <p className="mb-6 max-w-2xl text-muted-foreground">
+                      {project.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {project.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="border border-border px-2.5 py-1 text-[0.68rem] font-medium uppercase tracking-wider text-muted-foreground"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {project.image && (
+                    <div className="relative aspect-video overflow-hidden border border-border md:aspect-auto">
                       <Image
                         src={project.image}
                         alt={project.title}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="(min-width: 768px) 20rem, 100vw"
+                        className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/50 to-transparent" />
-                      <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <ExternalLink className="w-4 h-4" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/35 to-transparent" />
+                      <div className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center border border-border bg-background/80 opacity-0 transition-opacity group-hover:opacity-100">
+                        <ExternalLink className="h-4 w-4" />
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </Link>
             ))}
           </div>
+
+          <Link
+            href="/#work"
+            className="mt-10 inline-flex items-center gap-2 border border-border bg-secondary px-5 py-3 text-sm transition-colors hover:border-accent/40 hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Back to selected work
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
         </div>
       </section>
 
