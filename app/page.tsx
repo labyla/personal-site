@@ -2,6 +2,7 @@ import { Header } from "@/components/header"
 import { Hero } from "@/components/hero"
 import { TechMarquee } from "@/components/tech-marquee"
 import { BentoGrid } from "@/components/bento-grid"
+import { Experience } from "@/components/experience"
 import { Projects } from "@/components/projects"
 import { Blog } from "@/components/blog"
 import { About } from "@/components/about"
@@ -34,6 +35,7 @@ export default async function Home() {
       <Hero hero={hero} />
       <TechMarquee />
       <BentoGrid />
+      <Experience />
       <Projects projects={projects} />
       <Blog posts={posts} />
       <About about={about} />
