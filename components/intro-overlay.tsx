@@ -39,7 +39,7 @@ export function IntroOverlay() {
           transition={{ duration: 0.55, ease: "easeInOut" }}
         >
           <motion.div
-            className="intro-word flex overflow-hidden px-6 text-center text-4xl font-semibold tracking-normal sm:text-6xl md:text-7xl"
+            className="intro-word flex max-w-full overflow-hidden px-5 text-center text-4xl font-bold uppercase leading-none tracking-normal sm:text-6xl md:text-7xl lg:text-8xl"
             initial="hidden"
             animate="visible"
             variants={{

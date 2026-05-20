@@ -19,9 +19,9 @@ export function Header({ header }: HeaderProps) {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="fixed left-0 right-0 top-0 z-50 px-4 py-4"
+      className="fixed left-0 right-0 top-0 z-50 px-3 py-3 sm:px-5"
     >
-      <nav className="mx-auto flex max-w-6xl items-center justify-between border-b border-border bg-background/70 px-0 py-3 backdrop-blur-md">
+      <nav className="mx-auto flex w-full max-w-none items-center justify-between border border-border/70 bg-background/75 px-4 py-3 backdrop-blur-md sm:px-5 lg:px-6">
         <Link
           href="/"
           className="flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -72,7 +72,7 @@ export function Header({ header }: HeaderProps) {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="mx-auto mt-2 max-w-6xl border border-border bg-card/95 p-4 backdrop-blur-xl md:hidden"
+            className="mx-auto mt-2 w-full border border-border bg-card/95 p-4 backdrop-blur-xl md:hidden"
           >
             {header.navLinks.map((item) => (
               <Link
