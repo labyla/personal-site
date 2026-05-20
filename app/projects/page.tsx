@@ -4,6 +4,7 @@ import { ArrowLeft, ExternalLink } from "lucide-react"
 
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
+import { PublicSiteShell } from "@/components/public-site-shell"
 import { getProjects } from "@/lib/data/projects"
 import { getFooter, getHeader } from "@/lib/data/site-settings"
 
@@ -17,7 +18,7 @@ export default async function ProjectsPage() {
   ])
 
   return (
-    <main className="min-h-screen">
+    <PublicSiteShell>
       <Header header={header} />
 
       <section className="px-4 pt-32 pb-20">
@@ -47,12 +48,12 @@ export default async function ProjectsPage() {
               <Link
                 key={project.id}
                 href={project.href}
-                className={`group block relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br ${project.gradient} p-1`}
+                className="group block relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-accent/20 to-gradient-blue/10 p-1"
               >
                 <div className="relative bg-card rounded-[22px] overflow-hidden">
                   <div className="grid gap-6 p-6 md:grid-cols-2 md:p-8">
                     <div className="flex flex-col justify-center">
-                      <h2 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-pink-400 transition-colors">
+                      <h2 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-accent transition-colors">
                         {project.title}
                       </h2>
                       <p className="text-muted-foreground mb-6">
@@ -90,6 +91,6 @@ export default async function ProjectsPage() {
       </section>
 
       <Footer footer={footer} />
-    </main>
+    </PublicSiteShell>
   )
 }

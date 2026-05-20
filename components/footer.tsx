@@ -28,7 +28,7 @@ export function Footer({ footer }: FooterProps) {
           {/* Logo and description */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+              <div className="w-8 h-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-bold text-sm">
                 {footer.brandInitial}
               </div>
               <span className="font-semibold">{footer.brandName}</span>
@@ -116,7 +116,7 @@ export function Footer({ footer }: FooterProps) {
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-pink-500/20 transition-colors"
+                    className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-accent/15 transition-colors"
                   >
                     <Icon className="w-4 h-4" />
                   </Link>

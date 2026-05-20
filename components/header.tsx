@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Search } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { HeaderSettings } from "@/lib/data/site-settings-seed"
 
@@ -19,13 +19,19 @@ export function Header({ header }: HeaderProps) {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="fixed top-0 left-0 right-0 z-50 px-4 py-4"
+      className="fixed left-0 right-0 top-0 z-50 px-4 py-4"
     >
-      <nav className="max-w-6xl mx-auto bg-card/80 backdrop-blur-xl border border-border rounded-full px-6 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between border-b border-border bg-background/70 px-0 py-3 backdrop-blur-md">
+        <Link
+          href="/"
+          className="flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <div className="flex h-8 w-8 items-center justify-center border border-accent bg-accent text-sm font-bold text-accent-foreground">
             {header.logoText}
           </div>
+          <span className="hidden text-xs font-medium uppercase tracking-wider text-muted-foreground sm:inline">
+            Aayush Bharti
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -34,7 +40,7 @@ export function Header({ header }: HeaderProps) {
             <Link
               key={item.href}
               href={item.href}
-              className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-secondary"
+              className="px-3 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {item.label}
             </Link>
@@ -42,16 +48,16 @@ export function Header({ header }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <Search className="w-4 h-4" />
-          </Button>
-          <Button asChild className="hidden md:flex rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button
+            asChild
+            className="hidden rounded-none border border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground md:flex"
+          >
             <Link href={header.ctaHref}>{header.ctaLabel}</Link>
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden rounded-full"
+            className="rounded-none md:hidden"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -66,19 +72,19 @@ export function Header({ header }: HeaderProps) {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden mt-2 mx-4 bg-card/95 backdrop-blur-xl border border-border rounded-2xl p-4"
+            className="mx-auto mt-2 max-w-6xl border border-border bg-card/95 p-4 backdrop-blur-xl md:hidden"
           >
             {header.navLinks.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="block px-4 py-3 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
+                className="block px-4 py-3 text-sm uppercase tracking-wider text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 onClick={() => setIsOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
-            <Button asChild className="w-full mt-4 rounded-full">
+            <Button asChild className="mt-4 w-full rounded-none">
               <Link href={header.ctaHref} onClick={() => setIsOpen(false)}>
                 {header.ctaLabel}
               </Link>

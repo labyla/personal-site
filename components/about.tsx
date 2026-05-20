@@ -20,7 +20,7 @@ type AboutProps = {
 
 export function About({ about }: AboutProps) {
   return (
-    <section id="about" className="py-24 px-4">
+    <section id="about" className="px-4 py-20 md:py-28">
       <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <motion.div
@@ -31,7 +31,7 @@ export function About({ about }: AboutProps) {
             <p className="text-xs text-muted-foreground font-medium mb-4 uppercase tracking-wider">
               {about.eyebrow}
             </p>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 className="mb-6 text-4xl font-bold uppercase leading-none md:text-6xl">
               {about.titlePrefix}<br />
               <span className="text-muted-foreground">{about.titleMuted}</span>
             </h2>
@@ -48,7 +48,7 @@ export function About({ about }: AboutProps) {
                   <Link
                     key={social.label}
                     href={social.href}
-                    className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center hover:bg-pink-500/20 hover:border-pink-500/30 transition-colors"
+                    className="flex h-10 w-10 items-center justify-center border border-border bg-secondary transition-colors hover:border-accent/30 hover:bg-accent/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <Icon className="w-4 h-4" />
                   </Link>
@@ -64,8 +64,7 @@ export function About({ about }: AboutProps) {
             className="relative"
           >
             <div className="relative aspect-square max-w-md mx-auto">
-              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/30 to-purple-500/30 rounded-3xl blur-2xl" />
-              <div className="relative h-full rounded-3xl overflow-hidden border border-border">
+              <div className="relative h-full overflow-hidden border border-border">
                 <Image
                   src={about.imageUrl}
                   alt={about.imageAlt}

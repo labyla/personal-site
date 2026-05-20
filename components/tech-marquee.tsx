@@ -9,7 +9,7 @@ const technologies = [
 
 export function TechMarquee() {
   return (
-    <div className="relative overflow-hidden py-8 bg-card/30 border-y border-border">
+    <div className="relative overflow-hidden border-y border-border bg-background/60 py-5">
       <div className="flex">
         <motion.div
           animate={{ x: [0, -1920] }}
@@ -18,14 +18,14 @@ export function TechMarquee() {
             repeat: Infinity,
             ease: "linear"
           }}
-          className="flex gap-8 pr-8"
+          className="flex gap-3 pr-3"
         >
           {[...technologies, ...technologies, ...technologies].map((tech, i) => (
             <div
               key={i}
-              className="flex items-center gap-2 px-4 py-2 bg-secondary/50 border border-border rounded-full whitespace-nowrap"
+              className="flex items-center gap-2 whitespace-nowrap border border-border bg-secondary/40 px-3 py-2"
             >
-              <span className="text-sm text-muted-foreground">{tech}</span>
+              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{tech}</span>
             </div>
           ))}
         </motion.div>

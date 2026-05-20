@@ -4,6 +4,7 @@ import { ArrowLeft, Calendar } from "lucide-react"
 
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
+import { PublicSiteShell } from "@/components/public-site-shell"
 import { getPosts } from "@/lib/data/posts"
 import { getFooter, getHeader } from "@/lib/data/site-settings"
 
@@ -17,7 +18,7 @@ export default async function BlogPage() {
   ])
 
   return (
-    <main className="min-h-screen">
+    <PublicSiteShell>
       <Header header={header} />
 
       <section className="px-4 pt-32 pb-20">
@@ -48,7 +49,7 @@ export default async function BlogPage() {
               <Link
                 key={post.id}
                 href={post.href}
-                className="group block bg-card border border-border rounded-2xl overflow-hidden hover:border-pink-500/30 transition-all"
+                className="group block bg-card border border-border rounded-2xl overflow-hidden hover:border-accent/30 transition-all"
               >
                 <div className="relative aspect-video overflow-hidden">
                   <Image
@@ -68,7 +69,7 @@ export default async function BlogPage() {
                     )}
                     {post.readTime && <span>{post.readTime}</span>}
                   </div>
-                  <h2 className="font-semibold mb-2 group-hover:text-pink-400 transition-colors line-clamp-2">
+                  <h2 className="font-semibold mb-2 group-hover:text-accent transition-colors line-clamp-2">
                     {post.title}
                   </h2>
                   <p className="text-sm text-muted-foreground line-clamp-2">
@@ -82,6 +83,6 @@ export default async function BlogPage() {
       </section>
 
       <Footer footer={footer} />
-    </main>
+    </PublicSiteShell>
   )
 }

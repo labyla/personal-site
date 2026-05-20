@@ -6,6 +6,7 @@ import { ArrowLeft, ExternalLink } from "lucide-react"
 
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
+import { PublicSiteShell } from "@/components/public-site-shell"
 import { RichText } from "@/components/rich-text"
 import { getProjectBySlug } from "@/lib/data/projects"
 import { getFooter, getHeader } from "@/lib/data/site-settings"
@@ -66,7 +67,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const publishedAt = formatDate(project.publishedAt)
 
   return (
-    <main className="min-h-screen">
+    <PublicSiteShell>
       <Header header={header} />
 
       <article className="px-4 pt-32 pb-20">
@@ -136,6 +137,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       </article>
 
       <Footer footer={footer} />
-    </main>
+    </PublicSiteShell>
   )
 }

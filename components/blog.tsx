@@ -13,18 +13,18 @@ type BlogProps = {
 
 export function Blog({ posts }: BlogProps) {
   return (
-    <section id="blog" className="py-24 px-4 bg-card/30">
+    <section id="blog" className="border-y border-border bg-card/20 px-4 py-20 md:py-28">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="mb-12 md:mb-16"
         >
           <p className="text-xs text-muted-foreground font-medium mb-4 uppercase tracking-wider">
             LATEST ARTICLES
           </p>
-          <h2 className="text-4xl md:text-5xl font-bold">
+          <h2 className="text-4xl font-bold uppercase leading-none md:text-6xl">
             Thoughts <span className="text-muted-foreground">&</span>
           </h2>
         </motion.div>
@@ -40,7 +40,7 @@ export function Blog({ posts }: BlogProps) {
             >
               <Link
                 href={post.href}
-                className="group block bg-card border border-border rounded-2xl overflow-hidden hover:border-pink-500/30 transition-all"
+                className="group block overflow-hidden border border-border bg-card transition-colors hover:border-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <div className="relative aspect-video overflow-hidden">
                   <Image
@@ -60,7 +60,7 @@ export function Blog({ posts }: BlogProps) {
                     )}
                     {post.readTime && <span>{post.readTime}</span>}
                   </div>
-                  <h3 className="font-semibold mb-2 group-hover:text-pink-400 transition-colors line-clamp-2">
+                  <h3 className="font-semibold mb-2 group-hover:text-accent transition-colors line-clamp-2">
                     {post.title}
                   </h3>
                   <p className="text-sm text-muted-foreground line-clamp-2">
@@ -80,7 +80,7 @@ export function Blog({ posts }: BlogProps) {
         >
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-secondary border border-border rounded-full text-sm hover:bg-secondary/80 transition-colors"
+            className="inline-flex items-center gap-2 border border-border bg-secondary px-5 py-3 text-sm transition-colors hover:border-accent/40 hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Read more articles
             <ArrowUpRight className="w-4 h-4" />

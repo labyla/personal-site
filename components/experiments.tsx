@@ -48,7 +48,7 @@ export function Experiments() {
             >
               <Link
                 href="#"
-                className="group block relative overflow-hidden rounded-2xl border border-border bg-card hover:border-pink-500/30 transition-colors"
+                className="group block relative overflow-hidden rounded-2xl border border-border bg-card hover:border-accent/30 transition-colors"
               >
                 <div className="relative aspect-video overflow-hidden">
                   <Image
@@ -61,12 +61,12 @@ export function Experiments() {
                 </div>
                 <div className="p-6 flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold mb-1 group-hover:text-pink-400 transition-colors">
+                    <h3 className="font-semibold mb-1 group-hover:text-accent transition-colors">
                       {experiment.title}
                     </h3>
                     <p className="text-sm text-muted-foreground">{experiment.description}</p>
                   </div>
-                  <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-pink-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+                  <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
                 </div>
               </Link>
             </motion.div>
@@ -82,17 +82,17 @@ export function Experiments() {
           >
             <Link
               href="#"
-              className="group flex items-center gap-4 p-6 bg-card border border-border rounded-2xl hover:border-pink-500/30 transition-colors"
+              className="group flex items-center gap-4 p-6 bg-card border border-border rounded-2xl hover:border-accent/30 transition-colors"
             >
               <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
                 <span className="text-2xl">🔧</span>
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold group-hover:text-pink-400 transition-colors">
+                <h3 className="font-semibold group-hover:text-accent transition-colors">
                   Check out my favorite tools
                 </h3>
               </div>
-              <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-pink-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+              <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
             </Link>
           </motion.div>
 
@@ -104,17 +104,17 @@ export function Experiments() {
           >
             <Link
               href="#contact"
-              className="group flex items-center gap-4 p-6 bg-card border border-border rounded-2xl hover:border-pink-500/30 transition-colors"
+              className="group flex items-center gap-4 p-6 bg-card border border-border rounded-2xl hover:border-accent/30 transition-colors"
             >
               <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
                 <span className="text-2xl">👋</span>
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold group-hover:text-pink-400 transition-colors">
+                <h3 className="font-semibold group-hover:text-accent transition-colors">
                   Let me know you were here
                 </h3>
               </div>
-              <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-pink-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+              <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
             </Link>
           </motion.div>
         </div>

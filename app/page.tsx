@@ -10,6 +10,7 @@ import { Experiments } from "@/components/experiments"
 import { CTA } from "@/components/cta"
 import { ContactForm } from "@/components/contact-form"
 import { Footer } from "@/components/footer"
+import { PublicSiteShell } from "@/components/public-site-shell"
 import { getPosts } from "@/lib/data/posts"
 import { getProjects } from "@/lib/data/projects"
 import { getAbout, getCta, getFooter, getHeader, getHero } from "@/lib/data/site-settings"
@@ -28,7 +29,7 @@ export default async function Home() {
   const testimonials = await getTestimonials()
 
   return (
-    <main className="min-h-screen">
+    <PublicSiteShell>
       <Header header={header} />
       <Hero hero={hero} />
       <TechMarquee />
@@ -41,6 +42,6 @@ export default async function Home() {
       <CTA cta={cta} />
       <ContactForm />
       <Footer footer={footer} />
-    </main>
+    </PublicSiteShell>
   )
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ArrowRight, Sparkles } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 import type { CtaSettings } from "@/lib/data/site-settings-seed"
@@ -16,31 +16,25 @@ export function CTA({ cta }: CTAProps) {
   }
 
   return (
-    <section className="py-24 px-4">
+    <section className="px-4 py-20 md:py-28">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-pink-500/20 via-purple-500/20 to-blue-500/20 border border-pink-500/30 p-12 md:p-16 text-center"
+          className="relative overflow-hidden border border-accent/25 bg-card/70 p-8 text-center md:p-14"
         >
-          {/* Background effects */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-0 left-1/4 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl" />
-          </div>
-
           <div className="relative z-10">
             <div className="flex items-center justify-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold">
+              <div className="flex h-10 w-10 items-center justify-center border border-accent bg-accent font-bold text-accent-foreground">
                 {cta.avatarLetter}
               </div>
             </div>
 
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              {cta.titlePrefix}<span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">{cta.titleAccent}</span>
+            <h2 className="mb-4 text-3xl font-bold uppercase leading-none md:text-5xl">
+              {cta.titlePrefix}<span className="text-accent">{cta.titleAccent}</span>
               <br />
-              {cta.titleMiddle} <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">{cta.titleSuffix}</span>
+              {cta.titleMiddle} <span className="text-accent">{cta.titleSuffix}</span>
             </h2>
 
             <p className="text-muted-foreground mb-2">{cta.name}</p>
@@ -52,12 +46,12 @@ export function CTA({ cta }: CTAProps) {
 
             <Button
               size="lg"
-              className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 group"
+              className="group rounded-none bg-primary text-primary-foreground hover:bg-primary/90"
               asChild
             >
               <a href={cta.primaryCtaHref}>
                 {cta.primaryCtaLabel}
-                <Sparkles className="w-4 h-4 ml-2 group-hover:rotate-12 transition-transform" />
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </a>
             </Button>
           </div>
