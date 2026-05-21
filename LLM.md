@@ -53,6 +53,12 @@ Interactive public UI patterns currently include experience scroll reveal, selec
 
 The contact form uses underlined inputs, a stateful pending submit button, and an animated border wrapper around a solid dark inner panel. Do not change field names, honeypot behavior, validation, or the server action when adjusting presentation. Anchor navigation uses smooth scroll with reduced-motion fallback.
 
+The tech/skills marquee is an interactive infinite marquee. Skill icons are muted by default; on hover the icon uses its brand/original color and the text becomes white. The default state auto-scrolls. Hover/focus pauses movement at the current visual position and allows manual horizontal scrolling on the same list; manual scroll should feel infinite/looped rather than finite. Reduced-motion users get a static/manual-scrollable version. Do not reintroduce a crossfade between separate auto and manual layers because it looked like a second list appearing on top.
+
+The contact form visual system is dark minimal / slightly brutalist with underlined fields. Its existing server action, field names, honeypot, and validation contract must remain untouched. The pending button state shows `Pending` with a lightweight spinner. Animated border effects are allowed only as a border effect, not as the panel background; the inner form surface must stay clean/dark without gradient artifacts. The active/focus-within state may use a restrained green pulsing border. If glow creates artifacts inside the form, remove or simplify the glow. Reduced-motion must disable or simplify border rotation and pulse.
+
+Testimonials should be a full-width horizontal infinite marquee with looped cards and no empty gaps. The normal experience should not allow manual horizontal scrolling and should not show a scrollbar. Default direction is left; the last vertical page scroll direction controls horizontal direction: scroll down means left, scroll up means right. Vertical scroll velocity should temporarily increase horizontal marquee speed, then smoothly return to base speed after scrolling stops. Hover/focus may slightly slow the marquee but should not enable manual scroll. Reduced-motion users should get a static readable layout.
+
 ## Frontend Redesign History
 
 PR 1 established the visual foundation: dark tokens, vivid green accent, lightweight static atmospheric background, public shell, and intro overlay. A heavier moving mesh gradient was tested, then reverted because it caused unacceptable performance cost.
@@ -63,9 +69,15 @@ PR 2 redesigned the homepage direction, hero, header, and baseline section layou
 
 Keep global animation lightweight. Do not reintroduce heavy moving mesh gradients, large blurred full-screen animated layers, or paint-heavy background-position/background-size animation. Prefer transform/opacity for local motion and avoid expensive filters on large elements.
 
-Respect `prefers-reduced-motion`: animated backgrounds should be static or simplified, marquee auto-scroll should stop, contact border pulse/rotation should be disabled, and interaction should remain understandable without motion.
+Heavy moving mesh gradient backgrounds were tested and reverted because of performance issues. Keep the global background lightweight, static, and atmospheric. Avoid heavy blur/filter effects on large full-screen layers and avoid UI effects that repaint huge areas every frame. Prefer transform/opacity-based motion.
+
+Do not base Testimonials auto movement on `scrollLeft`; a previous implementation could reach the physical scroll end and stop. The preferred Testimonials implementation is transform-based: use duplicated tracks/cards, animate with RAF or CSS transform, keep an offset ref, wrap the offset with modulo based on one group width, use `overflow-hidden`, and avoid a manual scroll container in the normal mode.
+
+Respect `prefers-reduced-motion`: animated backgrounds should be static or simplified, intro should skip or simplify motion, marquee auto-scroll should stop, contact border pulse/rotation should be disabled, scroll-linked effects should become static/readable, and interaction should remain understandable without motion.
 
 Do not use external CDN scripts, Alpine snippets, Tailwind CDN, or third-party runtime scripts for UI effects. If a reference inspires an effect, implement the minimal local CSS/React needed inside the project.
+
+After each accepted frontend/design iteration, update `LLM.md` when the change affects future implementation decisions, visual direction, performance constraints, or component behavior. Keep frontend notes concise and practical for future Codex/LLM sessions.
 
 ## Backend Context Maintenance
 

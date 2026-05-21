@@ -308,6 +308,24 @@
   .skills-marquee::-webkit-scrollbar-thumb {
     background: color-mix(in oklch, var(--border) 72%, transparent);
   }
+
+  .testimonials-marquee {
+    overflow: hidden;
+    padding-inline: 1rem;
+    touch-action: pan-y;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
+    scrollbar-width: none;
+  }
+
+  .testimonials-marquee::-webkit-scrollbar {
+    display: none;
+  }
+
+  .testimonials-marquee__track {
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
 }
 
 @media (max-width: 767px) {
@@ -345,15 +363,22 @@
     transform: none;
   }
 
-  .skills-marquee {
+  .skills-marquee,
+  .testimonials-marquee {
     -webkit-mask-image: none;
     mask-image: none;
     overflow-x: auto;
     overflow-y: hidden;
   }
 
-  .skills-marquee__group[aria-hidden="true"] {
+  .skills-marquee__group[aria-hidden="true"],
+  .testimonials-marquee__group[aria-hidden="true"] {
     display: none;
+  }
+
+  .testimonials-marquee__track {
+    transform: none !important;
+    will-change: auto;
   }
 
   .contact-gradient-border::before,
