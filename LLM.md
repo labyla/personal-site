@@ -39,6 +39,34 @@ Pull requests should include a concise description, screenshots for UI changes, 
 
 Make surgical changes. Do not refactor unrelated components, reformat files wholesale, or add speculative abstractions. Match the existing Next.js, Tailwind, shadcn-style, and Docker-based workflow patterns already present in the repository.
 
+## Frontend / Design Direction
+
+The accepted public frontend direction is dark minimal, modern, technical, and slightly brutalist while remaining clean and readable. Use a restrained grayscale palette with vivid green as the primary accent. Green should be used deliberately for focus, active states, key highlights, and small details rather than as a broad decorative wash.
+
+The public site uses a lightweight static atmospheric background and an intro animation as part of its visual identity. The intro should remain short, polished, and respectful of reduced-motion settings. Avoid glossy SaaS cards, heavy shadows, rainbow gradients, large rounded corners, and decorative noise.
+
+## Frontend UI Conventions
+
+Prefer sharp or near-sharp surfaces, subtle borders, strong typography, generous negative space, and clear hierarchy. Article and project detail pages should use sharp editorial image frames, restrained borders, and typography consistent with the homepage redesign.
+
+Interactive public UI patterns currently include experience scroll reveal, selected-project hover/focus preview, blog/article card hover/focus image preview, and a tech marquee with icons, hover pause, and manual infinite horizontal scroll. These interactions must work with keyboard/focus where relevant and must respect `prefers-reduced-motion`.
+
+The contact form uses underlined inputs, a stateful pending submit button, and an animated border wrapper around a solid dark inner panel. Do not change field names, honeypot behavior, validation, or the server action when adjusting presentation. Anchor navigation uses smooth scroll with reduced-motion fallback.
+
+## Frontend Redesign History
+
+PR 1 established the visual foundation: dark tokens, vivid green accent, lightweight static atmospheric background, public shell, and intro overlay. A heavier moving mesh gradient was tested, then reverted because it caused unacceptable performance cost.
+
+PR 2 redesigned the homepage direction, hero, header, and baseline section layout toward the current dark minimal / slightly brutalist style. PR 3 added the experience scroll reveal and selected-project hover/focus preview. Later polish aligned blog cards, detail pages, tech marquee, contact form, and anchor scrolling with the same design system.
+
+## Known Design/Performance Decisions
+
+Keep global animation lightweight. Do not reintroduce heavy moving mesh gradients, large blurred full-screen animated layers, or paint-heavy background-position/background-size animation. Prefer transform/opacity for local motion and avoid expensive filters on large elements.
+
+Respect `prefers-reduced-motion`: animated backgrounds should be static or simplified, marquee auto-scroll should stop, contact border pulse/rotation should be disabled, and interaction should remain understandable without motion.
+
+Do not use external CDN scripts, Alpine snippets, Tailwind CDN, or third-party runtime scripts for UI effects. If a reference inspires an effect, implement the minimal local CSS/React needed inside the project.
+
 ## Backend Context Maintenance
 
 Backend/admin implementation is starting with a small MVP vertical slice. Keep this file updated as the project context source for future LLM sessions. Update `LLM.md` whenever an architectural decision is accepted, a backend feature is added, an API contract changes, a database model is introduced, a new environment variable is required, or an important backend convention is established.

@@ -92,9 +92,21 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+@property --contact-border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 @layer base {
   html {
     background: var(--background);
+    scroll-behavior: smooth;
+  }
+
+  section[id],
+  article[id] {
+    scroll-margin-top: 6.5rem;
   }
 
   * {
@@ -218,6 +230,84 @@
   .intro-word {
     font-family: var(--font-space), var(--font-inter), sans-serif;
   }
+
+  .contact-gradient-border {
+    --contact-border-angle: 0deg;
+    position: relative;
+    overflow: hidden;
+    padding: 1px;
+    background: color-mix(in oklch, var(--border) 84%, transparent);
+    isolation: isolate;
+  }
+
+  .contact-gradient-border::before,
+  .contact-gradient-border::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .contact-gradient-border::before {
+    background: conic-gradient(
+      from var(--contact-border-angle),
+      color-mix(in oklch, var(--border) 88%, transparent),
+      color-mix(in oklch, var(--accent) 72%, transparent),
+      color-mix(in oklch, var(--gradient-cyan) 42%, transparent),
+      color-mix(in oklch, var(--border) 86%, transparent),
+      color-mix(in oklch, var(--accent) 52%, transparent),
+      color-mix(in oklch, var(--border) 88%, transparent)
+    );
+    opacity: 0.96;
+    animation: contact-border-spin 6.5s linear infinite;
+  }
+
+  .contact-gradient-border::after {
+    background: color-mix(in oklch, var(--accent) 58%, var(--border));
+    opacity: 0;
+  }
+
+  .contact-gradient-border:focus-within::before {
+    opacity: 0;
+  }
+
+  .contact-gradient-border:focus-within::after {
+    opacity: 0.34;
+    animation: contact-border-pulse 1.65s ease-in-out infinite 520ms;
+  }
+
+  .contact-form-panel {
+    position: relative;
+    z-index: 1;
+    background: oklch(0.11 0.006 145);
+  }
+
+  .skills-marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    scrollbar-color: var(--border) transparent;
+    scrollbar-width: thin;
+  }
+
+  .skills-marquee:hover,
+  .skills-marquee:focus-within {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .skills-marquee::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .skills-marquee::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .skills-marquee::-webkit-scrollbar-thumb {
+    background: color-mix(in oklch, var(--border) 72%, transparent);
+  }
 }
 
 @media (max-width: 767px) {
@@ -231,7 +321,18 @@
   }
 }
 
+@media (hover: none) {
+  .skills-marquee {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {
@@ -242,5 +343,38 @@
 
   .site-background__spot {
     transform: none;
+  }
+
+  .skills-marquee {
+    -webkit-mask-image: none;
+    mask-image: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .skills-marquee__group[aria-hidden="true"] {
+    display: none;
+  }
+
+  .contact-gradient-border::before,
+  .contact-gradient-border:focus-within::after {
+    animation: none;
+  }
+}
+
+@keyframes contact-border-spin {
+  to {
+    --contact-border-angle: 360deg;
+  }
+}
+
+@keyframes contact-border-pulse {
+  0%,
+  100% {
+    opacity: 0.34;
+  }
+
+  50% {
+    opacity: 0.02;
   }
 }
