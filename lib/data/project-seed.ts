@@ -1,36 +1,9 @@
-type ProjectRichTextContent = {
-  root: {
-    type: "root"
-    children: Array<{
-      type: "heading" | "paragraph" | "quote"
-      children: Array<{
-        type: "text"
-        detail: 0
-        format: 0
-        mode: "normal"
-        style: ""
-        text: string
-        version: 1
-      }>
-      direction: null
-      format: ""
-      indent: 0
-      version: 1
-      tag?: "h2"
-    }>
-    direction: null
-    format: ""
-    indent: 0
-    version: 1
-  }
-}
-
 export type ProjectSeedItem = {
   slug: string
   title: string
   description: string
   excerpt: string
-  content: ProjectRichTextContent
+  contentMarkdown: string
   imageUrl: string
   tags: string[]
   href: string
@@ -44,71 +17,23 @@ export type ProjectSeedItem = {
   status: "published"
 }
 
-function text(textValue: string) {
-  return {
-    type: "text" as const,
-    detail: 0 as const,
-    format: 0 as const,
-    mode: "normal" as const,
-    style: "" as const,
-    text: textValue,
-    version: 1 as const,
-  }
-}
+function projectMarkdown(summary: string, result: string) {
+  return `## Overview
 
-function heading(textValue: string) {
-  return {
-    type: "heading" as const,
-    tag: "h2" as const,
-    children: [text(textValue)],
-    direction: null,
-    format: "" as const,
-    indent: 0 as const,
-    version: 1 as const,
-  }
-}
+${summary}
 
-function paragraph(textValue: string) {
-  return {
-    type: "paragraph" as const,
-    children: [text(textValue)],
-    direction: null,
-    format: "" as const,
-    indent: 0 as const,
-    version: 1 as const,
-  }
-}
+## Approach
 
-function quote(textValue: string) {
-  return {
-    type: "quote" as const,
-    children: [text(textValue)],
-    direction: null,
-    format: "" as const,
-    indent: 0 as const,
-    version: 1 as const,
-  }
-}
+The work focused on product clarity, responsive interaction patterns, and a frontend foundation that can evolve without fighting the content model.
 
-function projectContent(summary: string, result: string): ProjectRichTextContent {
-  return {
-    root: {
-      type: "root",
-      children: [
-        heading("Overview"),
-        paragraph(summary),
-        heading("Approach"),
-        paragraph("The work focused on product clarity, responsive interaction patterns, and a frontend foundation that can evolve without fighting the content model."),
-        quote("The goal was to make the experience feel intentional, useful, and ready to ship."),
-        heading("Outcome"),
-        paragraph(result),
-      ],
-      direction: null,
-      format: "",
-      indent: 0,
-      version: 1,
-    },
-  }
+{% hint style="success" %}
+The goal was to make the experience feel intentional, useful, and ready to ship.
+{% endhint %}
+
+## Outcome
+
+${result}
+`
 }
 
 export const projectSeedItems: ProjectSeedItem[] = [
@@ -117,7 +42,7 @@ export const projectSeedItems: ProjectSeedItem[] = [
     title: "Keythm",
     description: "Experience music typing that — every key has its own personality. The site responds to your fingers like a musical instrument.",
     excerpt: "A playful music typing experience where each keystroke becomes part of an expressive interface.",
-    content: projectContent(
+    contentMarkdown: projectMarkdown(
       "Keythm explores how typing can feel more tactile, rhythmic, and expressive. The interface treats the keyboard like an instrument and turns familiar input into a small performance.",
       "The result is a polished interactive prototype with a distinctive concept, strong motion language, and a memorable product feel.",
     ),
@@ -136,7 +61,7 @@ export const projectSeedItems: ProjectSeedItem[] = [
     title: "Learning Platform",
     description: "A immersive, gamified learning platform with real payments, real stuff, and real content delivery.",
     excerpt: "A gamified learning product combining progress, payments, and structured content delivery.",
-    content: projectContent(
+    contentMarkdown: projectMarkdown(
       "The learning platform brings together lessons, motivation loops, and commercial flows into one cohesive product experience.",
       "The project established a scalable product structure for course content, checkout, and learner engagement.",
     ),
@@ -155,7 +80,7 @@ export const projectSeedItems: ProjectSeedItem[] = [
     title: "Portfolio Website",
     description: "A space for self-expression in a digital chaos, explore drafts, and gain exposure with clean design.",
     excerpt: "A personal publishing and portfolio space designed for clarity, expression, and discovery.",
-    content: projectContent(
+    contentMarkdown: projectMarkdown(
       "The portfolio website balances editorial presentation with practical navigation, giving projects and personal writing enough room to breathe.",
       "The result is a flexible frontend that can grow into a CMS-driven personal site without losing its visual identity.",
     ),
@@ -174,7 +99,7 @@ export const projectSeedItems: ProjectSeedItem[] = [
     title: "Finance Tracker",
     description: "An intuitive mobile experience for organizing your digital wallet and analyzing your financial health.",
     excerpt: "A mobile finance experience for tracking wallet activity and understanding personal financial health.",
-    content: projectContent(
+    contentMarkdown: projectMarkdown(
       "The finance tracker focuses on making money movement easier to scan, categorize, and understand from a mobile-first interface.",
       "The final experience emphasizes quick comprehension, clear charts, and a calmer way to review financial activity.",
     ),
@@ -193,7 +118,7 @@ export const projectSeedItems: ProjectSeedItem[] = [
     title: "SaaS Dashboard",
     description: "A sleek SaaS landing page with a user-friendly design that enhances engagement.",
     excerpt: "A SaaS dashboard and landing experience designed for clearer product communication and engagement.",
-    content: projectContent(
+    contentMarkdown: projectMarkdown(
       "The SaaS dashboard combines product storytelling with operational clarity, helping users understand value quickly and move through the experience with confidence.",
       "The work produced a focused interface direction with reusable UI patterns and a stronger conversion path.",
     ),

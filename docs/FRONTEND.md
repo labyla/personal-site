@@ -87,7 +87,7 @@ Selected-project hover/focus preview is part of the current UI behavior and shou
 
 The home page Blog section receives server-loaded Payload post data through props. Blog cards link to `/blog/[slug]`.
 
-Blog cards and article/detail pages should stay aligned with the dark editorial style. Blog rich content uses the shared `components/rich-text.tsx` renderer.
+Blog cards and article/detail pages should stay aligned with the dark editorial style. Blog detail content uses the shared `components/markdown-content.tsx` renderer.
 
 ## Testimonials
 

@@ -1,8 +1,6 @@
 import config from "@payload-config"
 import { getPayload } from "payload"
 
-import type { Post } from "@/payload-types"
-
 import { postSeedItems } from "./post-seed"
 
 export type BlogPostListItem = {
@@ -21,7 +19,7 @@ export type BlogPostDetail = {
   slug: string
   title: string
   excerpt: string
-  content: Post["content"]
+  contentMarkdown: string
   coverImageUrl: string
   readingTime: string
   publishedAt: string | null
@@ -46,7 +44,7 @@ type PayloadPost = {
   title?: string | null
   slug?: string | null
   excerpt?: string | null
-  content?: Post["content"]
+  contentMarkdown?: string | null
   coverImageUrl?: string | null
   readingTime?: string | null
   publishedAt?: string | null
@@ -90,7 +88,7 @@ function mapPostDetail(post: PayloadPost): BlogPostDetail {
     slug: post.slug || "",
     title: post.title || "",
     excerpt: post.excerpt || "",
-    content: post.content || null,
+    contentMarkdown: post.contentMarkdown || "",
     coverImageUrl: post.coverImageUrl || "",
     readingTime: post.readingTime || "",
     publishedAt: post.publishedAt || null,

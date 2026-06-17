@@ -37,8 +37,15 @@ export const Projects: CollectionConfig = {
       type: "textarea",
     },
     {
-      name: "content",
-      type: "richText",
+      name: "contentMarkdown",
+      type: "textarea",
+      admin: {
+        components: {
+          Field: "@/components/admin/markdown-editor-field#MarkdownEditorField",
+        },
+        description:
+          "Primary body content. Supports standard Markdown, GFM tables, details/summary/kbd HTML, and GitBook-style hint, tabs, and stepper blocks.",
+      },
     },
     {
       name: "imageUrl",

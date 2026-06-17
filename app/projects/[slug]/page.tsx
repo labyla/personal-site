@@ -6,8 +6,8 @@ import { ArrowLeft, ExternalLink } from "lucide-react"
 
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
+import { MarkdownContent } from "@/components/markdown-content"
 import { PublicSiteShell } from "@/components/public-site-shell"
-import { RichText } from "@/components/rich-text"
 import { getProjectBySlug } from "@/lib/data/projects"
 import { getFooter, getHeader } from "@/lib/data/site-settings"
 
@@ -130,8 +130,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           )}
 
           <div className="mx-auto mt-14 max-w-3xl border-t border-border pt-10">
-            {project.content ? (
-              <RichText data={project.content} />
+            {project.contentMarkdown ? (
+              <MarkdownContent content={project.contentMarkdown} />
             ) : (
               <p className="text-muted-foreground">Project story is being prepared.</p>
             )}

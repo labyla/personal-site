@@ -142,15 +142,17 @@ Decision: Extend `Projects` with detail-page fields while keeping card/list fiel
 
 Why: Future detail pages need richer content without breaking existing project cards.
 
-Consequences: Project `content` uses Payload Lexical Rich Text. Blocks/page-builder and media upload remain deferred. `href` remains for compatibility.
+Consequences: Project body content uses Markdown. Blocks/page-builder and media upload remain deferred. `href` remains for compatibility.
 
-## PR 10 — Reuse Lexical Rich Text Architecture
 
-Decision: Use Payload Lexical Rich Text through the root `lexicalEditor({})` config.
 
-Why: Projects and future Blog detail pages should share one rich content approach.
+## Undated — Markdown Body Content Format
 
-Consequences: `components/rich-text.tsx` is the reusable frontend renderer for project and blog detail pages.
+Decision: Project and Post body content should use `contentMarkdown` as the only editable body format.
+
+Why: The authoring workflow needs README-style copy/paste, raw Markdown editing, and a preview mode while retaining support for richer callouts and structured documentation blocks. There is no production project/post content yet, so retaining Lexical fallback would add unused complexity.
+
+Consequences: Public detail pages render `contentMarkdown` through `components/markdown-content.tsx`. The supported format is standard Markdown plus GFM, frontmatter tolerance, limited safe HTML, and GitBook-like `hint`, `tabs`, and `stepper` blocks. Payload Admin uses a custom Markdown field with Preview and Raw modes. Lexical rich text fields, renderers, and dependencies are removed from Projects/Posts.
 
 ## PR 11 — Add Project Detail Pages
 
@@ -174,7 +176,7 @@ Decision: Use `/blog/[slug]` as the canonical internal route for blog articles.
 
 Why: Blog cards should navigate to readable post detail pages.
 
-Consequences: `getPostBySlug(slug)` fetches only published posts. Missing/unavailable data returns `notFound()`. Blog and Project detail pages share `components/rich-text.tsx`.
+Consequences: `getPostBySlug(slug)` fetches only published posts. Missing/unavailable data returns `notFound()`. Blog and Project detail pages share `components/markdown-content.tsx`.
 
 ## PR 14 — Add Contact Submission Backend
 

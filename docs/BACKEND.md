@@ -47,7 +47,7 @@ Card/list fields include:
 
 Detail-page fields include:
 
-- `content`
+- `contentMarkdown`
 - `excerpt`
 - `publishedAt`
 - `metaTitle`
@@ -55,7 +55,15 @@ Detail-page fields include:
 - `canonicalUrl`
 - `externalUrl`
 
-Project detail content uses Payload Lexical Rich Text through `@payloadcms/richtext-lexical`. Blocks/page-builder are not used yet. Media upload remains deferred; `imageUrl` is still a string.
+Project detail body content uses `contentMarkdown`. The field stores raw Markdown with GitBook-like extensions and uses a custom Payload Admin field with Preview and Raw modes. Lexical rich text and blocks/page-builder are not used. Media upload remains deferred; `imageUrl` is still a string.
+
+Supported Markdown body features:
+
+- Standard Markdown headings, paragraphs, links, blockquotes, lists, code, and horizontal rules.
+- GitHub Flavored Markdown tables and task lists.
+- YAML frontmatter is accepted and ignored by the public renderer.
+- Limited safe HTML for README-style content, including `details`, `summary`, and `kbd`.
+- GitBook-like blocks: `{% hint style="info|warning|success|danger" %}`, `{% tabs %}` / `{% tab title="..." %}`, and `{% stepper %}` / `{% step %}`.
 
 Public fetching uses only `status=published` projects. Ordering is `sortOrder`, then `createdAt`, then `title`.
 
@@ -93,7 +101,7 @@ Fields:
 - `title`
 - `slug`
 - `excerpt`
-- `content`
+- `contentMarkdown`
 - `coverImageUrl`
 - `readingTime`
 - `publishedAt`
@@ -106,7 +114,7 @@ Fields:
 
 Tags/categories are not included yet because the current Blog section UI does not display them.
 
-Posts use the same content architecture as Projects: card/list data is separate from detail content, `content` uses Payload Lexical Rich Text, and public rendering uses `components/rich-text.tsx`.
+Posts use the same content architecture as Projects: card/list data is separate from detail body content, `contentMarkdown` is the only body source, and public rendering uses `components/markdown-content.tsx`.
 
 Public fetching uses only `status=published` posts. Ordering is `sortOrder`, then `publishedAt`, then `createdAt`, then `title`.
 

@@ -6,8 +6,8 @@ import { ArrowLeft } from "lucide-react"
 
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
+import { MarkdownContent } from "@/components/markdown-content"
 import { PublicSiteShell } from "@/components/public-site-shell"
-import { RichText } from "@/components/rich-text"
 import { getPostBySlug } from "@/lib/data/posts"
 import { getFooter, getHeader } from "@/lib/data/site-settings"
 
@@ -112,8 +112,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           )}
 
           <div className="mx-auto mt-14 max-w-3xl border-t border-border pt-10">
-            {post.content ? (
-              <RichText data={post.content} />
+            {post.contentMarkdown ? (
+              <MarkdownContent content={post.contentMarkdown} />
             ) : (
               <p className="text-muted-foreground">Article is being prepared.</p>
             )}

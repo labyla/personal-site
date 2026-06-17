@@ -27,6 +27,8 @@
 ## Payload / Data
 
 - Payload is the source of truth for CMS-backed content.
+- Project and Post body content uses `contentMarkdown` only; do not reintroduce Lexical rich text fallback unless explicitly approved.
+- GitBook-like Markdown support is intentionally limited to the approved subset; do not assume full GitBook compatibility.
 - Do not overwrite Payload-edited content with seed scripts.
 - Collection seed scripts should create missing records and skip existing records by `slug`.
 - `seed:site-settings` should fill missing values and empty arrays, not overwrite populated Payload Admin edits.

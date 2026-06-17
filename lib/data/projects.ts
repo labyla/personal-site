@@ -1,8 +1,6 @@
 import config from "@payload-config"
 import { getPayload } from "payload"
 
-import type { Project } from "@/payload-types"
-
 import { projectSeedItems } from "./project-seed"
 
 export type ProjectListItem = {
@@ -22,7 +20,7 @@ export type ProjectDetail = {
   title: string
   description: string
   excerpt: string
-  content: Project["content"]
+  contentMarkdown: string
   imageUrl: string
   tags: string[]
   publishedAt: string | null
@@ -57,7 +55,7 @@ type PayloadProject = {
   title?: string | null
   description?: string | null
   excerpt?: string | null
-  content?: Project["content"]
+  contentMarkdown?: string | null
   imageUrl?: string | null
   tags?: Array<{
     label?: string | null
@@ -100,7 +98,7 @@ function mapProjectDetail(project: PayloadProject): ProjectDetail {
     title: project.title || "",
     description: project.description || "",
     excerpt: project.excerpt || project.description || "",
-    content: project.content || null,
+    contentMarkdown: project.contentMarkdown || "",
     imageUrl: project.imageUrl || "",
     tags,
     publishedAt: project.publishedAt || null,

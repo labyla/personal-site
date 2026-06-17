@@ -163,21 +163,10 @@ export interface Project {
   slug: string;
   description: string;
   excerpt?: string | null;
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  /**
+   * Primary body content. Supports standard Markdown, GFM tables, details/summary/kbd HTML, and GitBook-style hint, tabs, and stepper blocks.
+   */
+  contentMarkdown?: string | null;
   imageUrl: string;
   tags?:
     | {
@@ -206,21 +195,10 @@ export interface Post {
   title: string;
   slug: string;
   excerpt: string;
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  /**
+   * Primary body content. Supports standard Markdown, GFM tables, details/summary/kbd HTML, and GitBook-style hint, tabs, and stepper blocks.
+   */
+  contentMarkdown?: string | null;
   coverImageUrl: string;
   readingTime?: string | null;
   publishedAt?: string | null;
@@ -385,7 +363,7 @@ export interface ProjectsSelect<T extends boolean = true> {
   slug?: T;
   description?: T;
   excerpt?: T;
-  content?: T;
+  contentMarkdown?: T;
   imageUrl?: T;
   tags?:
     | T
@@ -413,7 +391,7 @@ export interface PostsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   excerpt?: T;
-  content?: T;
+  contentMarkdown?: T;
   coverImageUrl?: T;
   readingTime?: T;
   publishedAt?: T;

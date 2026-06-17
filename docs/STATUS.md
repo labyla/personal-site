@@ -15,7 +15,7 @@ This status reflects the currently accepted project context. Before major change
 - SiteSettings Global groups for Hero, About, CTA, Footer, and Header.
 - Site settings seed script with fill-missing behavior.
 - Posts collection, seed script, home page Blog connection, archive page, and detail pages.
-- Shared Payload Lexical rich text renderer for Projects and Posts.
+- Shared Markdown/GitBook-like renderer for Projects and Posts.
 - ContactSubmissions collection and controlled public server action.
 - Public Contact Form UI connected to the server action.
 - Contact form preservation of entered values after server validation errors.
