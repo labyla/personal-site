@@ -346,47 +346,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-  }
-
-  .site-background__spot {
-    transform: none;
-  }
-
-  .skills-marquee,
-  .testimonials-marquee {
-    -webkit-mask-image: none;
-    mask-image: none;
-    overflow-x: auto;
-    overflow-y: hidden;
-  }
-
-  .skills-marquee__group[aria-hidden="true"],
-  .testimonials-marquee__group[aria-hidden="true"] {
-    display: none;
-  }
-
-  .testimonials-marquee__track {
-    transform: none !important;
-    will-change: auto;
-  }
-
-  .contact-gradient-border::before,
-  .contact-gradient-border:focus-within::after {
-    animation: none;
-  }
-}
-
 @keyframes contact-border-spin {
   to {
     --contact-border-angle: 360deg;

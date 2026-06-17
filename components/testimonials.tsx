@@ -62,11 +62,8 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
   const velocityBoostRef = useRef(0)
   const groupWidthRef = useRef(0)
   const speedMultiplierRef = useRef(1)
-  const isReducedMotionRef = useRef(false)
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
-    isReducedMotionRef.current = mediaQuery.matches
     lastScrollYRef.current = window.scrollY
     lastScrollTimeRef.current = performance.now()
 
@@ -117,7 +114,7 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
     }
 
     function handleWheel(event: WheelEvent) {
-      if (event.deltaY === 0 || isReducedMotionRef.current) {
+      if (event.deltaY === 0) {
         return
       }
 
@@ -126,10 +123,6 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
     }
 
     function handleScroll() {
-      if (isReducedMotionRef.current) {
-        return
-      }
-
       const scrollY = window.scrollY
       const now = performance.now()
       const deltaY = scrollY - lastScrollYRef.current
@@ -147,7 +140,7 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
     function tick(timestamp: number) {
       const track = trackRef.current
 
-      if (!track || isReducedMotionRef.current) {
+      if (!track) {
         return
       }
 
@@ -183,30 +176,11 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
       frameRef.current = window.requestAnimationFrame(tick)
     }
 
-    function handleMotionChange(event: MediaQueryListEvent) {
-      isReducedMotionRef.current = event.matches
-      lastFrameTimeRef.current = null
-      velocityBoostRef.current = 0
-      offsetRef.current = 0
-      renderOffset()
-
-      if (!event.matches && frameRef.current === null) {
-        frameRef.current = window.requestAnimationFrame(tick)
-      }
-
-      if (event.matches && frameRef.current !== null) {
-        window.cancelAnimationFrame(frameRef.current)
-        frameRef.current = null
-      }
-    }
-
     const resizeObserver = new ResizeObserver(handleResize)
     renderOffset()
     window.requestAnimationFrame(renderOffset)
 
-    if (!mediaQuery.matches) {
-      frameRef.current = window.requestAnimationFrame(tick)
-    }
+    frameRef.current = window.requestAnimationFrame(tick)
 
     if (groupRef.current) {
       resizeObserver.observe(groupRef.current)
@@ -215,14 +189,12 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
     window.addEventListener("wheel", handleWheel, { passive: true })
     window.addEventListener("scroll", handleScroll, { passive: true })
     window.addEventListener("resize", handleResize)
-    mediaQuery.addEventListener("change", handleMotionChange)
 
     return () => {
       resizeObserver.disconnect()
       window.removeEventListener("wheel", handleWheel)
       window.removeEventListener("scroll", handleScroll)
       window.removeEventListener("resize", handleResize)
-      mediaQuery.removeEventListener("change", handleMotionChange)
 
       if (frameRef.current !== null) {
         window.cancelAnimationFrame(frameRef.current)

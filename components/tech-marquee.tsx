@@ -65,14 +65,10 @@ export function TechMarquee() {
   const frameRef = useRef<number | null>(null)
   const lastTimeRef = useRef<number | null>(null)
   const isPausedRef = useRef(false)
-  const isReducedMotionRef = useRef(false)
   const groupWidthRef = useRef(0)
   const isResettingScrollRef = useRef(false)
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
-    isReducedMotionRef.current = mediaQuery.matches
-
     function measureGroupWidth() {
       const container = scrollRef.current
 
@@ -93,11 +89,6 @@ export function TechMarquee() {
         return
       }
 
-      if (isReducedMotionRef.current) {
-        container.scrollLeft = 0
-        return
-      }
-
       const groupWidth = measureGroupWidth()
 
       if (groupWidth === 0) {
@@ -114,7 +105,6 @@ export function TechMarquee() {
       if (
         !container ||
         groupWidth === 0 ||
-        isReducedMotionRef.current ||
         isResettingScrollRef.current
       ) {
         return
@@ -134,7 +124,7 @@ export function TechMarquee() {
     function tick(timestamp: number) {
       const container = scrollRef.current
 
-      if (!container || isReducedMotionRef.current) {
+      if (!container) {
         return
       }
 
@@ -154,36 +144,17 @@ export function TechMarquee() {
       frameRef.current = window.requestAnimationFrame(tick)
     }
 
-    function handleMotionChange(event: MediaQueryListEvent) {
-      isReducedMotionRef.current = event.matches
-      lastTimeRef.current = null
-      setInitialScrollPosition()
-
-      if (!event.matches && frameRef.current === null) {
-        frameRef.current = window.requestAnimationFrame(tick)
-      }
-
-      if (event.matches && frameRef.current !== null) {
-        window.cancelAnimationFrame(frameRef.current)
-        frameRef.current = null
-      }
-    }
-
     const container = scrollRef.current
     setInitialScrollPosition()
 
-    if (!mediaQuery.matches) {
-      frameRef.current = window.requestAnimationFrame(tick)
-    }
+    frameRef.current = window.requestAnimationFrame(tick)
 
     container?.addEventListener("scroll", normalizeScrollPosition, { passive: true })
     window.addEventListener("resize", setInitialScrollPosition)
-    mediaQuery.addEventListener("change", handleMotionChange)
 
     return () => {
       container?.removeEventListener("scroll", normalizeScrollPosition)
       window.removeEventListener("resize", setInitialScrollPosition)
-      mediaQuery.removeEventListener("change", handleMotionChange)
 
       if (frameRef.current !== null) {
         window.cancelAnimationFrame(frameRef.current)

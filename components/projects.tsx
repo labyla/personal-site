@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -16,11 +16,10 @@ type ProjectsProps = {
 export function Projects({ projects }: ProjectsProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const previewRef = useRef<HTMLDivElement>(null)
-  const shouldReduceMotion = useReducedMotion()
   const activeProject = activeIndex === null ? null : projects[activeIndex]
 
   function handleMouseMove(event: React.MouseEvent<HTMLDivElement>) {
-    if (shouldReduceMotion || !previewRef.current) {
+    if (!previewRef.current) {
       return
     }
 
@@ -143,13 +142,9 @@ export function Projects({ projects }: ProjectsProps) {
                 {activeProject?.image && (
                   <motion.div
                     key={activeProject.id}
-                    initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
-                    animate={
-                      shouldReduceMotion
-                        ? { opacity: 1 }
-                        : { opacity: 1, y: "var(--project-preview-y)" }
-                    }
-                    exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: "var(--project-preview-y)" }}
+                    exit={{ opacity: 0, y: -12 }}
                     transition={{ duration: 0.28, ease: "easeOut" }}
                     className="absolute inset-x-0 top-10 overflow-hidden border border-border bg-card"
                   >

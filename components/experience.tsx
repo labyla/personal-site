@@ -3,7 +3,6 @@
 import { useRef } from "react"
 import {
   motion,
-  useReducedMotion,
   useScroll,
   useTransform,
 } from "framer-motion"
@@ -40,7 +39,6 @@ function ExperienceItem({
   index,
 }: (typeof experienceItems)[number] & { index: number }) {
   const itemRef = useRef<HTMLDivElement>(null)
-  const shouldReduceMotion = useReducedMotion()
   const { scrollYProgress } = useScroll({
     target: itemRef,
     offset: ["start 82%", "center 48%"],
@@ -51,7 +49,7 @@ function ExperienceItem({
   return (
     <motion.article
       ref={itemRef}
-      style={shouldReduceMotion ? undefined : { opacity, y }}
+      style={{ opacity, y }}
       className="border-t border-border py-10 md:py-12"
     >
       <div className="mb-5 flex items-center gap-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -78,7 +76,6 @@ function ExperienceItem({
 
 export function Experience() {
   const sectionRef = useRef<HTMLElement>(null)
-  const shouldReduceMotion = useReducedMotion()
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start 78%", "end 55%"],
@@ -89,7 +86,7 @@ export function Experience() {
     <section ref={sectionRef} id="experience" className="px-4 py-20 md:py-28">
       <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[16rem_minmax(0,1fr)]">
         <motion.div
-          style={shouldReduceMotion ? undefined : { y: labelY }}
+          style={{ y: labelY }}
           className="lg:sticky lg:top-32 lg:self-start"
         >
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">

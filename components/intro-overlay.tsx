@@ -12,12 +12,6 @@ export function IntroOverlay() {
   const [isTextExiting, setIsTextExiting] = useState(false)
 
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-
-    if (prefersReducedMotion) {
-      return
-    }
-
     setIsTextExiting(false)
     setShouldPlay(true)
 
