@@ -20,6 +20,10 @@ This status reflects the currently accepted project context. Before major change
 - ContactSubmissions collection and controlled public server action.
 - Public Contact Form UI connected to the server action.
 - Contact form preservation of entered values after server validation errors.
+- Contact form animated validation UI with red submit-button/general-error state and field-error clearing on focus.
+- Header scroll-linked accent fill that reaches full progress at the Contact section.
+- Header hash navigation routes shared header links from non-home pages back to home sections.
+- Tech Stack section glow polish that avoids clipped top/bottom gradient edges.
 
 ## In Progress / Current Direction
 

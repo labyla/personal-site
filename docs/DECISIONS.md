@@ -239,3 +239,35 @@ Decision: Do not reintroduce heavy moving mesh gradients or large paint-heavy an
 Why: A tested moving mesh gradient caused unacceptable performance cost.
 
 Consequences: Keep the global background lightweight/static and prefer local transform/opacity motion.
+
+## Undated — Header Accent Fill Completes At Contact
+
+Decision: The fixed Header uses a scroll-linked green accent fill that reaches 100% when `#contact` reaches its anchor position, not at the document footer.
+
+Why: Contact is the final primary conversion section, so reaching full header emphasis there feels intentional while keeping the footer visually stable.
+
+Consequences: Header progress should be computed against the `#contact` scroll target, account for the section's scroll margin, clamp after 100%, and remain transform/opacity based for lightweight motion.
+
+## Undated — Tech Stack Glow Must Fade Within Its Bounds
+
+Decision: The Tech Stack section background glow should use a sufficiently large, smoothly fading gradient instead of a short glow box that clips at its top and bottom edges.
+
+Why: Visible horizontal clipping makes the atmospheric glow look like a broken rectangular layer.
+
+Consequences: Keep the section glow subtle and local. Avoid heavy blur filters or broad decorative washes when fixing glow artifacts.
+
+## Undated — Contact Validation Error State Lives In The Button
+
+Decision: On contact form validation failure, the submit button turns red and shows a short actionable error prompt, and the form border also turns red.
+
+Why: Keeping the general error inside the primary action makes the failure state compact and visually connected to the attempted submission.
+
+Consequences: Do not add a separate general error line above the submit button. Keep the button prompt short enough for narrow mobile widths. When a user focuses any field after a submit error, clear the general form error styling while preserving field-specific errors. Hide each field-specific error when that field receives focus during the same error cycle. Keep transitions fast and animated.
+
+## Undated — Header Hash Links Target Home Sections
+
+Decision: Header hash links stored as `#section` values are treated as global home-page section links and rendered as `/#section`.
+
+Why: The Header is shared across archive and detail pages, but sections such as `#about`, `#work`, `#blog`, and `#contact` live on the home page only.
+
+Consequences: From non-home pages, Header section links should navigate to the home page with the hash. From the home page, clicking a section link should manually scroll to that section even if the URL already contains the same hash.

@@ -39,6 +39,17 @@ The Header uses:
 - `ctaLabel`
 - `ctaHref`
 
+The Header has a scroll-linked green accent fill. It starts at 0% at the top of
+the page and reaches 100% when the `#contact` section reaches its anchor
+position, then stays full through the footer. Keep this motion transform/opacity
+based and subtle; the green layer is an accent wash, not a fully solid header
+theme.
+
+Header hash links are global home-page section links. Render `#section` values
+from `SiteSettings.header` as `/#section` so the same Header works from archive
+and detail pages. On the home page, repeated clicks on the current hash must
+still scroll to the section, even when the URL already contains that hash.
+
 Do not add `brandName`, external/new-tab link behavior, or header hiding unless a future task explicitly changes the UI. Header visual design and desktop/mobile menu behavior should remain stable unless directly asked.
 
 ## Hero
@@ -128,6 +139,9 @@ The former LAB/Experiments homepage block is now a Tech Stack section linked by 
 - The section is split into Skills and Tools.
 - Cards should stay compact, sharp, and grid-based.
 - Hover states may reveal the item brand color, border emphasis, and a restrained glow.
+- The large section background glow should fade smoothly inside its own bounds.
+  Avoid short gradient boxes that create visible horizontal clipping at the top
+  or bottom of the glow.
 - Keep the section in the public site's dark technical style, not the purple/glass-heavy reference style.
 
 ## Contact
@@ -146,9 +160,18 @@ Fields:
 
 Do not change field names, honeypot behavior, validation, or server action contracts when adjusting presentation.
 
-The pending button state shows `Pending` with a lightweight spinner. Animated border effects are allowed only as border effects, not as the panel background. The inner form surface must stay clean/dark without gradient artifacts. A restrained green pulsing border is acceptable for active/focus-within state. If glow creates artifacts inside the form, remove or simplify it.
+The pending button state shows `Pending` with a lightweight spinner. Animated border effects are allowed only as border effects, not as the panel background. The inner form surface must stay clean/dark without gradient artifacts. A restrained green pulsing border is acceptable for active/focus-within state and may peak slightly brighter while a field is active. If glow creates artifacts inside the form, remove or simplify it.
 
 Contact form inputs are controlled so server-side validation errors do not clear user-entered values. The form resets only after successful submission.
+
+On server validation errors, do not show a separate general error message above
+the submit button. The submit button itself should turn red and display a short
+actionable error prompt, while the form border turns red. Keep the button text
+short enough to fit narrow mobile widths. When the user focuses any field after
+that error state, the form and button return to their normal visual state.
+Field-specific errors remain visible until their own field receives focus, then
+that field error is hidden for the current error cycle. Keep these state changes
+quick but animated rather than abrupt.
 
 ## Footer
 

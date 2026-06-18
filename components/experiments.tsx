@@ -68,7 +68,7 @@ export function Experiments() {
   return (
     <section id="tools" className="relative overflow-hidden px-4 py-24 md:py-28">
       <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute left-1/2 top-24 h-64 w-[42rem] -translate-x-1/2 bg-[radial-gradient(circle,color-mix(in_oklch,var(--accent)_18%,transparent),transparent_64%)] opacity-80" />
+        <div className="absolute left-1/2 top-0 h-[34rem] w-[56rem] -translate-x-1/2 bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,color-mix(in_oklch,var(--accent)_18%,transparent)_0%,transparent_72%)] opacity-80" />
         <div className="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
 

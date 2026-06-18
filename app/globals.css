@@ -238,6 +238,7 @@
     padding: 1px;
     background: color-mix(in oklch, var(--border) 84%, transparent);
     isolation: isolate;
+    transition: background 180ms ease;
   }
 
   .contact-gradient-border::before,
@@ -273,8 +274,19 @@
   }
 
   .contact-gradient-border:focus-within::after {
-    opacity: 0.34;
+    opacity: 0.48;
     animation: contact-border-pulse 1.65s ease-in-out infinite 520ms;
+  }
+
+  .contact-gradient-border[data-status="error"]::before {
+    background: color-mix(in oklch, var(--destructive) 78%, var(--border));
+    opacity: 0.9;
+    animation: none;
+  }
+
+  .contact-gradient-border[data-status="error"]::after {
+    opacity: 0;
+    animation: none;
   }
 
   .contact-form-panel {
@@ -346,10 +358,10 @@
 @keyframes contact-border-pulse {
   0%,
   100% {
-    opacity: 0.34;
+    opacity: 0.48;
   }
 
   50% {
-    opacity: 0.02;
+    opacity: 0.08;
   }
 }
