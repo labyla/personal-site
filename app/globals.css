@@ -284,29 +284,27 @@
   }
 
   .skills-marquee {
+    cursor: grab;
     overflow: hidden;
     -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
     mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-    scrollbar-color: var(--border) transparent;
-    scrollbar-width: thin;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    touch-action: pan-y;
+    user-select: none;
   }
 
-  .skills-marquee:hover,
-  .skills-marquee:focus-within {
-    overflow-x: auto;
-    overflow-y: hidden;
+  .skills-marquee:active {
+    cursor: grabbing;
   }
 
   .skills-marquee::-webkit-scrollbar {
-    height: 6px;
+    display: none;
   }
 
-  .skills-marquee::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .skills-marquee::-webkit-scrollbar-thumb {
-    background: color-mix(in oklch, var(--border) 72%, transparent);
+  .skills-marquee__track {
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
   }
 
   .testimonials-marquee {
@@ -336,13 +334,6 @@
 
   .site-background__spot--violet {
     width: 68vw;
-  }
-}
-
-@media (hover: none) {
-  .skills-marquee {
-    overflow-x: auto;
-    overflow-y: hidden;
   }
 }
 

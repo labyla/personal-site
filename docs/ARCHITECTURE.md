@@ -19,7 +19,8 @@
 - `app/blog` and `app/blog/[slug]`: public blog archive/detail routes.
 - `components/`: public page sections and reusable UI components.
 - `components/ui/`: shadcn-style primitives.
-- `components/rich-text.tsx`: shared Payload Lexical rich text renderer for projects and posts.
+- `components/rich-text.tsx`: shared GitHub-like Markdown renderer for projects and posts.
+- `components/admin/github-markdown-field.tsx`: Payload Admin Markdown editor with Edit/Preview modes and a slash helper.
 - `collections/`: Payload collections such as `Users`, `Projects`, `Testimonials`, `Posts`, and `ContactSubmissions`.
 - `globals/`: Payload globals such as `SiteSettings`.
 - `lib/data/`: server-side public data loaders and seed/fallback source data.

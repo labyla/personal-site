@@ -1,35 +1,8 @@
-type PostRichTextContent = {
-  root: {
-    type: "root"
-    children: Array<{
-      type: "heading" | "paragraph" | "quote"
-      children: Array<{
-        type: "text"
-        detail: 0
-        format: 0
-        mode: "normal"
-        style: ""
-        text: string
-        version: 1
-      }>
-      direction: null
-      format: ""
-      indent: 0
-      version: 1
-      tag?: "h2"
-    }>
-    direction: null
-    format: ""
-    indent: 0
-    version: 1
-  }
-}
-
 export type PostSeedItem = {
   slug: string
   title: string
   excerpt: string
-  content: PostRichTextContent
+  content: string
   coverImageUrl: string
   readingTime: string
   publishedAt: string
@@ -41,69 +14,18 @@ export type PostSeedItem = {
   canonicalUrl?: string
 }
 
-function text(textValue: string) {
-  return {
-    type: "text" as const,
-    detail: 0 as const,
-    format: 0 as const,
-    mode: "normal" as const,
-    style: "" as const,
-    text: textValue,
-    version: 1 as const,
-  }
-}
+function postContent(intro: string, body: string) {
+  return `## Overview
 
-function heading(textValue: string) {
-  return {
-    type: "heading" as const,
-    tag: "h2" as const,
-    children: [text(textValue)],
-    direction: null,
-    format: "" as const,
-    indent: 0 as const,
-    version: 1 as const,
-  }
-}
+${intro}
 
-function paragraph(textValue: string) {
-  return {
-    type: "paragraph" as const,
-    children: [text(textValue)],
-    direction: null,
-    format: "" as const,
-    indent: 0 as const,
-    version: 1 as const,
-  }
-}
+## Notes
 
-function quote(textValue: string) {
-  return {
-    type: "quote" as const,
-    children: [text(textValue)],
-    direction: null,
-    format: "" as const,
-    indent: 0 as const,
-    version: 1 as const,
-  }
-}
+${body}
 
-function postContent(intro: string, body: string): PostRichTextContent {
-  return {
-    root: {
-      type: "root",
-      children: [
-        heading("Overview"),
-        paragraph(intro),
-        heading("Notes"),
-        paragraph(body),
-        quote("This seed content is a starting point and should be replaced from Payload Admin."),
-      ],
-      direction: null,
-      format: "",
-      indent: 0,
-      version: 1,
-    },
-  }
+> [!NOTE]
+> This seed content is a starting point and should be replaced from Payload Admin.
+`
 }
 
 export const postSeedItems: PostSeedItem[] = [

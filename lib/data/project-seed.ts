@@ -1,36 +1,9 @@
-type ProjectRichTextContent = {
-  root: {
-    type: "root"
-    children: Array<{
-      type: "heading" | "paragraph" | "quote"
-      children: Array<{
-        type: "text"
-        detail: 0
-        format: 0
-        mode: "normal"
-        style: ""
-        text: string
-        version: 1
-      }>
-      direction: null
-      format: ""
-      indent: 0
-      version: 1
-      tag?: "h2"
-    }>
-    direction: null
-    format: ""
-    indent: 0
-    version: 1
-  }
-}
-
 export type ProjectSeedItem = {
   slug: string
   title: string
   description: string
   excerpt: string
-  content: ProjectRichTextContent
+  content: string
   imageUrl: string
   tags: string[]
   href: string
@@ -44,71 +17,22 @@ export type ProjectSeedItem = {
   status: "published"
 }
 
-function text(textValue: string) {
-  return {
-    type: "text" as const,
-    detail: 0 as const,
-    format: 0 as const,
-    mode: "normal" as const,
-    style: "" as const,
-    text: textValue,
-    version: 1 as const,
-  }
-}
+function projectContent(summary: string, result: string) {
+  return `## Overview
 
-function heading(textValue: string) {
-  return {
-    type: "heading" as const,
-    tag: "h2" as const,
-    children: [text(textValue)],
-    direction: null,
-    format: "" as const,
-    indent: 0 as const,
-    version: 1 as const,
-  }
-}
+${summary}
 
-function paragraph(textValue: string) {
-  return {
-    type: "paragraph" as const,
-    children: [text(textValue)],
-    direction: null,
-    format: "" as const,
-    indent: 0 as const,
-    version: 1 as const,
-  }
-}
+## Approach
 
-function quote(textValue: string) {
-  return {
-    type: "quote" as const,
-    children: [text(textValue)],
-    direction: null,
-    format: "" as const,
-    indent: 0 as const,
-    version: 1 as const,
-  }
-}
+The work focused on product clarity, responsive interaction patterns, and a frontend foundation that can evolve without fighting the content model.
 
-function projectContent(summary: string, result: string): ProjectRichTextContent {
-  return {
-    root: {
-      type: "root",
-      children: [
-        heading("Overview"),
-        paragraph(summary),
-        heading("Approach"),
-        paragraph("The work focused on product clarity, responsive interaction patterns, and a frontend foundation that can evolve without fighting the content model."),
-        quote("The goal was to make the experience feel intentional, useful, and ready to ship."),
-        heading("Outcome"),
-        paragraph(result),
-      ],
-      direction: null,
-      format: "",
-      indent: 0,
-      version: 1,
-    },
-  }
+> [!NOTE]
+> The goal was to make the experience feel intentional, useful, and ready to ship.
+
+## Outcome
+
+${result}
+`
 }
 
 export const projectSeedItems: ProjectSeedItem[] = [

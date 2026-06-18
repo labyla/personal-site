@@ -1,122 +1,98 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ArrowUpRight } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
+import type { CSSProperties } from "react"
 
-const experiments = [
-  {
-    id: 1,
-    title: "Motion UI",
-    description: "Kinematic & Experiments",
-    image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop"
-  },
-  {
-    id: 2,
-    title: "Layer.ai",
-    description: "Building the Future",
-    image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=300&fit=crop"
-  }
-]
+import {
+  skillItems,
+  toolItems,
+  type TechStackItem,
+} from "@/components/tech-stack-data"
+
+type TechStackGroupProps = {
+  eyebrow: string
+  items: TechStackItem[]
+  title: string
+}
+
+function TechStackCard({ item }: { item: TechStackItem }) {
+  const Icon = item.icon
+
+  return (
+    <div
+      className="group relative flex min-h-24 flex-col items-center justify-center gap-3 overflow-hidden border border-border bg-card/55 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 hover:bg-secondary/70"
+      style={{ "--stack-color": item.color } as CSSProperties}
+    >
+      <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <div className="absolute inset-x-4 top-0 h-px bg-[var(--stack-color)]/80" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklch,var(--stack-color)_22%,transparent),transparent_58%)]" />
+      </div>
+
+      <Icon className="relative h-7 w-7 text-muted-foreground transition-colors duration-300 group-hover:text-[var(--stack-color)]" />
+      <span className="relative text-center text-xs font-medium uppercase tracking-wider text-muted-foreground transition-colors duration-300 group-hover:text-foreground">
+        {item.name}
+      </span>
+    </div>
+  )
+}
+
+function TechStackGroup({ eyebrow, items, title }: TechStackGroupProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.5 }}
+      className="border border-border bg-background/45 p-4 md:p-5"
+    >
+      <div className="mb-5 flex items-end justify-between gap-4 border-b border-border pb-4">
+        <div>
+          <p className="mb-2 text-xs font-medium uppercase tracking-wider text-accent">
+            {eyebrow}
+          </p>
+          <h3 className="text-2xl font-bold uppercase leading-none md:text-3xl">{title}</h3>
+        </div>
+        <p className="font-mono text-xs text-muted-foreground">{items.length} ITEMS</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {items.map((item) => (
+          <TechStackCard key={item.name} item={item} />
+        ))}
+      </div>
+    </motion.div>
+  )
+}
 
 export function Experiments() {
   return (
-    <section className="py-24 px-4">
-      <div className="max-w-6xl mx-auto">
+    <section id="tools" className="relative overflow-hidden px-4 py-24 md:py-28">
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <div className="absolute left-1/2 top-24 h-64 w-[42rem] -translate-x-1/2 bg-[radial-gradient(circle,color-mix(in_oklch,var(--accent)_18%,transparent),transparent_64%)] opacity-80" />
+        <div className="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="mx-auto mb-14 max-w-3xl text-center"
         >
-          <p className="text-xs text-muted-foreground font-medium mb-4 uppercase tracking-wider">
-            LAB
+          <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            STACK
           </p>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Explore, experiment</h2>
-          <p className="text-muted-foreground">Journeys, skills & experiences</p>
+          <h2 className="text-5xl font-bold uppercase leading-none md:text-7xl">
+            Tech stack
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-muted-foreground">
+            The languages, frameworks, and daily tools I use to build and ship.
+          </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {experiments.map((experiment, index) => (
-            <motion.div
-              key={experiment.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <Link
-                href="#"
-                className="group block relative overflow-hidden rounded-2xl border border-border bg-card hover:border-accent/30 transition-colors"
-              >
-                <div className="relative aspect-video overflow-hidden">
-                  <Image
-                    src={experiment.image}
-                    alt={experiment.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-                </div>
-                <div className="p-6 flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold mb-1 group-hover:text-accent transition-colors">
-                      {experiment.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">{experiment.description}</p>
-                  </div>
-                  <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <Link
-              href="#"
-              className="group flex items-center gap-4 p-6 bg-card border border-border rounded-2xl hover:border-accent/30 transition-colors"
-            >
-              <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
-                <span className="text-2xl">🔧</span>
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold group-hover:text-accent transition-colors">
-                  Check out my favorite tools
-                </h3>
-              </div>
-              <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <Link
-              href="#contact"
-              className="group flex items-center gap-4 p-6 bg-card border border-border rounded-2xl hover:border-accent/30 transition-colors"
-            >
-              <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
-                <span className="text-2xl">👋</span>
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold group-hover:text-accent transition-colors">
-                  Let me know you were here
-                </h3>
-              </div>
-              <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-            </Link>
-          </motion.div>
+        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+          <TechStackGroup eyebrow="01" items={skillItems} title="Skills" />
+          <TechStackGroup eyebrow="02" items={toolItems} title="Tools" />
         </div>
       </div>
     </section>

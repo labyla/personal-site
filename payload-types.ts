@@ -163,21 +163,10 @@ export interface Project {
   slug: string;
   description: string;
   excerpt?: string | null;
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  /**
+   * GitHub-flavored Markdown. Paste README.md content here.
+   */
+  content?: string | null;
   imageUrl: string;
   tags?:
     | {
@@ -206,21 +195,10 @@ export interface Post {
   title: string;
   slug: string;
   excerpt: string;
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  /**
+   * GitHub-flavored Markdown. Use Preview before publishing.
+   */
+  content?: string | null;
   coverImageUrl: string;
   readingTime?: string | null;
   publishedAt?: string | null;

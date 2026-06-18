@@ -87,7 +87,7 @@ Selected-project hover/focus preview is part of the current UI behavior and shou
 
 The home page Blog section receives server-loaded Payload post data through props. Blog cards link to `/blog/[slug]`.
 
-Blog cards and article/detail pages should stay aligned with the dark editorial style. Blog rich content uses the shared `components/rich-text.tsx` renderer.
+Blog cards and article/detail pages should stay aligned with the dark editorial style. Blog Markdown content uses the shared `components/rich-text.tsx` renderer.
 
 ## Testimonials
 
@@ -107,18 +107,28 @@ The marquee should keep auto-moving regardless of OS/browser reduced-motion sett
 
 Do not base Testimonials movement on `scrollLeft`; use transform-based movement with duplicated tracks/cards, an offset ref, modulo wrapping based on one group width, and `overflow-hidden`.
 
-## Tech / Skills Marquee
+## Tech / Skills And Tools Marquee
 
-The tech/skills marquee is an interactive infinite marquee.
+The tech/skills and tools/apps marquee is an interactive infinite marquee immediately after the Hero.
 
 - Skill icons are muted by default.
 - On hover, icons use brand/original color and text becomes white.
-- Default state auto-scrolls.
-- Hover/focus pauses at the current visual position and allows manual horizontal scrolling on the same list.
+- Default state auto-scrolls. Skills move left, tools/apps move right.
+- Hover/focus slows at the current visual position.
+- Dragging with the left mouse button pauses the track and allows manual horizontal movement on the same list.
 - Manual scroll should feel infinite/looped rather than finite.
 - The marquee should keep auto-moving regardless of OS/browser reduced-motion settings.
 
-Do not reintroduce a crossfade between separate auto and manual layers; that looked like a second list appearing on top.
+Use transform-based movement with duplicated groups, like Testimonials. Do not reintroduce a crossfade between separate auto and manual layers; that looked like a second list appearing on top.
+
+## Tech Stack
+
+The former LAB/Experiments homepage block is now a Tech Stack section linked by `#tools`.
+
+- The section is split into Skills and Tools.
+- Cards should stay compact, sharp, and grid-based.
+- Hover states may reveal the item brand color, border emphasis, and a restrained glow.
+- Keep the section in the public site's dark technical style, not the purple/glass-heavy reference style.
 
 ## Contact
 

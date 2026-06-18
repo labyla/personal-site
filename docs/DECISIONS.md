@@ -142,15 +142,23 @@ Decision: Extend `Projects` with detail-page fields while keeping card/list fiel
 
 Why: Future detail pages need richer content without breaking existing project cards.
 
-Consequences: Project `content` uses Payload Lexical Rich Text. Blocks/page-builder and media upload remain deferred. `href` remains for compatibility.
+Consequences: Project `content` originally used Payload Lexical Rich Text, then moved to GitHub-like Markdown. Blocks/page-builder and media upload remain deferred. `href` remains for compatibility.
 
 ## PR 10 — Reuse Lexical Rich Text Architecture
 
-Decision: Use Payload Lexical Rich Text through the root `lexicalEditor({})` config.
+Decision: Originally use Payload Lexical Rich Text through the root `lexicalEditor({})` config.
 
 Why: Projects and future Blog detail pages should share one rich content approach.
 
-Consequences: `components/rich-text.tsx` is the reusable frontend renderer for project and blog detail pages.
+Consequences: Superseded by the later GitHub-like Markdown decision. `components/rich-text.tsx` remains the reusable frontend renderer for project and blog detail pages.
+
+## Undated - Use GitHub-like Markdown For Project And Post Content
+
+Decision: Store Project and Post detail `content` as GitHub-flavored Markdown strings in Payload `textarea` fields instead of Payload Lexical Rich Text.
+
+Why: Most project material already exists as GitHub README.md files, and copying Markdown into the site should not require converting content into a separate rich text structure.
+
+Consequences: The Payload Admin content editor uses a custom Markdown field with Edit/Preview modes and a slash helper. Public project and blog detail pages render Markdown through `components/rich-text.tsx`. Existing Lexical JSON content needs manual replacement or a migration before it will render as Markdown.
 
 ## PR 11 — Add Project Detail Pages
 

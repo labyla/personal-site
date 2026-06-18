@@ -38,7 +38,15 @@ export const Projects: CollectionConfig = {
     },
     {
       name: "content",
-      type: "richText",
+      type: "textarea",
+      admin: {
+        components: {
+          Field: "@/components/admin/github-markdown-field#default",
+        },
+        description: "GitHub-flavored Markdown. Paste README.md content here.",
+        placeholder: "# Project title\n\nPaste a README.md or write GitHub Markdown...",
+        rows: 24,
+      },
     },
     {
       name: "imageUrl",

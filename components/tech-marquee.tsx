@@ -2,159 +2,125 @@
 
 import { useEffect, useRef } from "react"
 import type { CSSProperties, FocusEvent, PointerEvent } from "react"
-import {
-  Blocks,
-  Braces,
-  Code2,
-  Database,
-  FileText,
-  Figma,
-  Layers3,
-  NotebookTabs,
-  PenTool,
-  Server,
-  Triangle,
-  Wind,
-  Zap,
-  type LucideIcon,
-} from "lucide-react"
 
-type Skill = {
-  name: string
-  color: string
-  icon: LucideIcon
+import { skillItems, toolItems, type TechStackItem } from "@/components/tech-stack-data"
+
+const marqueeGroupCount = 6
+const baseSpeed = 0.035
+const hoverSpeedMultiplier = 0.72
+const maxFrameMovement = 72
+
+type MarqueeRowProps = {
+  ariaLabel: string
+  direction: -1 | 1
+  items: TechStackItem[]
+  rowClassName?: string
 }
 
-const skills: Skill[] = [
-  { name: "React", color: "#61dafb", icon: Blocks },
-  { name: "Next.js", color: "#ffffff", icon: Triangle },
-  { name: "TypeScript", color: "#3178c6", icon: Braces },
-  { name: "Tailwind CSS", color: "#38bdf8", icon: Wind },
-  { name: "CSS", color: "#663399", icon: Code2 },
-  { name: "Motion.dev", color: "#facc15", icon: Zap },
-  { name: "Sanity CMS", color: "#f03e2f", icon: Layers3 },
-  { name: "Figma", color: "#a259ff", icon: Figma },
-  { name: "Notion", color: "#f5f5f5", icon: NotebookTabs },
-  { name: "Markdown", color: "#ffffff", icon: FileText },
-  { name: "Node.js", color: "#68a063", icon: Server },
-  { name: "Express.js", color: "#f5f5f5", icon: PenTool },
-  { name: "Redis", color: "#dc382d", icon: Database },
-]
-
-const marqueeItems = [...skills, ...skills, ...skills]
-const marqueeGroupCount = 3
-
-function SkillChip({ skill }: { skill: Skill }) {
-  const Icon = skill.icon
+function MarqueeChip({ item }: { item: TechStackItem }) {
+  const Icon = item.icon
 
   return (
     <div
       className="group flex items-center gap-2 whitespace-nowrap border border-border bg-secondary/40 px-3 py-2 transition-colors hover:border-accent/35 hover:bg-secondary/70"
-      style={{ "--skill-color": skill.color } as CSSProperties}
+      style={{ "--skill-color": item.color } as CSSProperties}
     >
       <Icon className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-[var(--skill-color)]" />
       <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground transition-colors group-hover:text-foreground">
-        {skill.name}
+        {item.name}
       </span>
     </div>
   )
 }
 
-export function TechMarquee() {
-  const scrollRef = useRef<HTMLDivElement>(null)
+function MarqueeRow({ ariaLabel, direction, items, rowClassName }: MarqueeRowProps) {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const groupRef = useRef<HTMLDivElement>(null)
   const frameRef = useRef<number | null>(null)
-  const lastTimeRef = useRef<number | null>(null)
-  const isPausedRef = useRef(false)
+  const lastFrameTimeRef = useRef<number | null>(null)
+  const offsetRef = useRef(0)
   const groupWidthRef = useRef(0)
-  const isResettingScrollRef = useRef(false)
+  const speedMultiplierRef = useRef(1)
+  const isDraggingRef = useRef(false)
+  const dragStartXRef = useRef(0)
+  const dragStartOffsetRef = useRef(0)
 
   useEffect(() => {
     function measureGroupWidth() {
-      const container = scrollRef.current
+      const group = groupRef.current
 
-      if (!container) {
+      if (!group) {
         return 0
       }
 
-      const groupWidth = container.scrollWidth / marqueeGroupCount
+      const groupWidth = group.getBoundingClientRect().width
       groupWidthRef.current = groupWidth
 
       return groupWidth
     }
 
-    function setInitialScrollPosition() {
-      const container = scrollRef.current
-
-      if (!container) {
-        return
-      }
-
-      const groupWidth = measureGroupWidth()
-
-      if (groupWidth === 0) {
-        return
-      }
-
-      container.scrollLeft = groupWidth
-    }
-
-    function normalizeScrollPosition() {
-      const container = scrollRef.current
+    function renderOffset() {
+      const track = trackRef.current
       const groupWidth = groupWidthRef.current || measureGroupWidth()
 
-      if (
-        !container ||
-        groupWidth === 0 ||
-        isResettingScrollRef.current
-      ) {
+      if (!track || groupWidth === 0) {
         return
       }
 
-      if (container.scrollLeft < groupWidth * 0.45) {
-        isResettingScrollRef.current = true
-        container.scrollLeft += groupWidth
-        isResettingScrollRef.current = false
-      } else if (container.scrollLeft > groupWidth * 1.55) {
-        isResettingScrollRef.current = true
-        container.scrollLeft -= groupWidth
-        isResettingScrollRef.current = false
+      offsetRef.current = ((offsetRef.current % groupWidth) + groupWidth) % groupWidth
+
+      if (offsetRef.current > 0) {
+        offsetRef.current -= groupWidth
       }
+
+      track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`
+    }
+
+    function handleResize() {
+      window.requestAnimationFrame(renderOffset)
     }
 
     function tick(timestamp: number) {
-      const container = scrollRef.current
+      const track = trackRef.current
 
-      if (!container) {
+      if (!track) {
         return
       }
 
-      if (lastTimeRef.current === null) {
-        lastTimeRef.current = timestamp
+      if (lastFrameTimeRef.current === null) {
+        lastFrameTimeRef.current = timestamp
       }
 
-      const delta = timestamp - lastTimeRef.current
-      lastTimeRef.current = timestamp
+      const delta = timestamp - lastFrameTimeRef.current
+      lastFrameTimeRef.current = timestamp
 
-      if (!isPausedRef.current) {
-        groupWidthRef.current ||= measureGroupWidth()
-        container.scrollLeft += delta * 0.035
-        normalizeScrollPosition()
-      }
+      const movement = direction * baseSpeed * speedMultiplierRef.current * delta
+      const clampedMovement = Math.max(
+        -maxFrameMovement,
+        Math.min(maxFrameMovement, movement),
+      )
+
+      offsetRef.current += clampedMovement
+      renderOffset()
 
       frameRef.current = window.requestAnimationFrame(tick)
     }
 
-    const container = scrollRef.current
-    setInitialScrollPosition()
+    const resizeObserver = new ResizeObserver(handleResize)
+    renderOffset()
+    window.requestAnimationFrame(renderOffset)
 
     frameRef.current = window.requestAnimationFrame(tick)
 
-    container?.addEventListener("scroll", normalizeScrollPosition, { passive: true })
-    window.addEventListener("resize", setInitialScrollPosition)
+    if (groupRef.current) {
+      resizeObserver.observe(groupRef.current)
+    }
+
+    window.addEventListener("resize", handleResize)
 
     return () => {
-      container?.removeEventListener("scroll", normalizeScrollPosition)
-      window.removeEventListener("resize", setInitialScrollPosition)
+      resizeObserver.disconnect()
+      window.removeEventListener("resize", handleResize)
 
       if (frameRef.current !== null) {
         window.cancelAnimationFrame(frameRef.current)
@@ -162,56 +128,135 @@ export function TechMarquee() {
     }
   }, [])
 
-  function pauseMarquee() {
-    isPausedRef.current = true
+  function slowMarquee() {
+    speedMultiplierRef.current = hoverSpeedMultiplier
   }
 
-  function resumeMarquee() {
-    isPausedRef.current = false
-    lastTimeRef.current = null
+  function pauseMarquee() {
+    speedMultiplierRef.current = 0
+  }
+
+  function resumeMarqueeSpeed() {
+    speedMultiplierRef.current = 1
+    lastFrameTimeRef.current = null
+  }
+
+  function handleMouseLeave() {
+    if (!isDraggingRef.current) {
+      resumeMarqueeSpeed()
+    }
   }
 
   function handleBlur(event: FocusEvent<HTMLDivElement>) {
     if (!event.currentTarget.contains(event.relatedTarget)) {
-      resumeMarquee()
+      resumeMarqueeSpeed()
     }
   }
 
   function handlePointerEnd(event: PointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "mouse" && isDraggingRef.current) {
+      isDraggingRef.current = false
+
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId)
+      }
+
+      if (!event.currentTarget.matches(":hover")) {
+        resumeMarqueeSpeed()
+      } else {
+        slowMarquee()
+      }
+    }
+
     if (event.pointerType !== "mouse") {
-      resumeMarquee()
+      resumeMarqueeSpeed()
     }
   }
 
+  function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
+    pauseMarquee()
+
+    if (event.pointerType !== "mouse" || event.button !== 0) {
+      return
+    }
+
+    isDraggingRef.current = true
+    dragStartXRef.current = event.clientX
+    dragStartOffsetRef.current = offsetRef.current
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
+
+  function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
+    if (!isDraggingRef.current) {
+      return
+    }
+
+    event.preventDefault()
+    const dragDistance = event.clientX - dragStartXRef.current
+    offsetRef.current = dragStartOffsetRef.current + dragDistance
+
+    const track = trackRef.current
+    const groupWidth = groupWidthRef.current
+
+    if (!track || groupWidth === 0) {
+      return
+    }
+
+    offsetRef.current = ((offsetRef.current % groupWidth) + groupWidth) % groupWidth
+
+    if (offsetRef.current > 0) {
+      offsetRef.current -= groupWidth
+    }
+
+    track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`
+  }
+
+  return (
+    <div
+      aria-label={ariaLabel}
+      className={`skills-marquee py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${rowClassName || ""}`}
+      tabIndex={0}
+      onMouseEnter={slowMarquee}
+      onMouseLeave={handleMouseLeave}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerEnd}
+      onFocus={slowMarquee}
+      onBlur={handleBlur}
+    >
+      <div ref={trackRef} className="skills-marquee__track flex w-max">
+        {Array.from({ length: marqueeGroupCount }, (_, groupIndex) => (
+          <div
+            ref={groupIndex === 0 ? groupRef : undefined}
+            key={groupIndex}
+            className="skills-marquee__group flex gap-3 pr-3"
+            aria-hidden={groupIndex !== 0}
+          >
+            {items.map((item) => (
+              <MarqueeChip key={`${groupIndex}-${item.name}`} item={item} />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function TechMarquee() {
   return (
     <div className="border-y border-border bg-background/60">
-      <div
-        ref={scrollRef}
-        aria-label="Scrollable skills list"
-        className="skills-marquee py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        tabIndex={0}
-        onMouseEnter={pauseMarquee}
-        onMouseLeave={resumeMarquee}
-        onPointerDown={pauseMarquee}
-        onPointerUp={handlePointerEnd}
-        onPointerCancel={handlePointerEnd}
-        onFocus={pauseMarquee}
-        onBlur={handleBlur}
-      >
-        <div className="flex w-max">
-          {Array.from({ length: marqueeGroupCount }, (_, groupIndex) => (
-            <div
-              key={groupIndex}
-              className="skills-marquee__group flex gap-3 pr-3"
-              aria-hidden={groupIndex !== 1}
-            >
-              {marqueeItems.slice(groupIndex * skills.length, (groupIndex + 1) * skills.length).map((skill) => (
-                <SkillChip key={`${groupIndex}-${skill.name}`} skill={skill} />
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
+      <MarqueeRow
+        ariaLabel="Scrollable skills list"
+        direction={-1}
+        items={skillItems}
+        rowClassName="border-b border-border/70"
+      />
+      <MarqueeRow
+        ariaLabel="Scrollable tools and apps list"
+        direction={1}
+        items={toolItems}
+      />
     </div>
   )
 }

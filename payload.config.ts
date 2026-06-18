@@ -1,5 +1,4 @@
 import { postgresAdapter } from "@payloadcms/db-postgres"
-import { lexicalEditor } from "@payloadcms/richtext-lexical"
 import path from "path"
 import { buildConfig } from "payload"
 import { fileURLToPath } from "url"
@@ -52,7 +51,6 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL,
     },
   }),
-  editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || "",
   globals: [SiteSettings],
   typescript: {

@@ -1,0 +1,160 @@
+.root {
+  color: var(--muted-foreground, var(--theme-elevation-650));
+  font-size: 1rem;
+  line-height: 2;
+}
+
+.root > * + * {
+  margin-top: 1.75rem;
+}
+
+.root a {
+  color: var(--foreground, var(--theme-text));
+  text-decoration-color: color-mix(in oklch, var(--accent, var(--theme-success-500)) 60%, transparent);
+  text-decoration-line: underline;
+  text-underline-offset: 4px;
+}
+
+.root a:hover {
+  color: var(--accent, var(--theme-success-500));
+}
+
+.root blockquote {
+  border-left: 2px solid var(--accent, var(--theme-success-500));
+  color: var(--foreground, var(--theme-text));
+  padding-left: 1.25rem;
+}
+
+.root code {
+  background: var(--secondary, var(--theme-elevation-100));
+  color: var(--foreground, var(--theme-text));
+  font-family: var(--font-mono), monospace;
+  font-size: 0.875rem;
+  padding: 0.125rem 0.375rem;
+}
+
+.root details {
+  border: 1px solid var(--border, var(--theme-elevation-150));
+  padding: 1rem;
+}
+
+.root details summary {
+  color: var(--foreground, var(--theme-text));
+  cursor: pointer;
+}
+
+.root h1,
+.root h2,
+.root h3,
+.root h4 {
+  color: var(--foreground, var(--theme-text));
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.root h1 {
+  font-size: 2.25rem;
+}
+
+.root h2 {
+  border-top: 1px solid var(--border, var(--theme-elevation-150));
+  font-size: 1.875rem;
+  padding-top: 2rem;
+}
+
+.root h3 {
+  font-size: 1.5rem;
+  padding-top: 1.5rem;
+}
+
+.root h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.root img {
+  border: 1px solid var(--border, var(--theme-elevation-150));
+  display: block;
+  margin-block: 2rem;
+  width: 100%;
+}
+
+.root input[type="checkbox"] {
+  accent-color: var(--accent, var(--theme-success-500));
+  margin-right: 0.5rem;
+}
+
+.root li {
+  margin-block: 0.5rem;
+}
+
+.root ol,
+.root ul {
+  padding-left: 1.5rem;
+}
+
+.root ol {
+  list-style: decimal;
+}
+
+.root ul {
+  list-style: disc;
+}
+
+.root pre {
+  background: var(--secondary, var(--theme-elevation-100));
+  border: 1px solid var(--border, var(--theme-elevation-150));
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+.root pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.root sup a {
+  color: var(--accent, var(--theme-success-500));
+}
+
+.root table {
+  border-collapse: collapse;
+  display: block;
+  margin-block: 2rem;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.root td,
+.root th {
+  border: 1px solid var(--border, var(--theme-elevation-150));
+  padding: 0.5rem 0.75rem;
+}
+
+.root th {
+  color: var(--foreground, var(--theme-text));
+}
+
+.root :global(.markdown-alert) {
+  background: color-mix(in oklch, var(--secondary, var(--theme-elevation-100)) 40%, transparent);
+  border-left: 2px solid var(--accent, var(--theme-success-500));
+  padding: 1rem;
+}
+
+.root :global(.markdown-alert-title) {
+  color: var(--foreground, var(--theme-text));
+  font-family: var(--font-mono), monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.root :global(.markdown-footnotes) {
+  border-top: 1px solid var(--border, var(--theme-elevation-150));
+  font-size: 0.875rem;
+  padding-top: 1.5rem;
+}

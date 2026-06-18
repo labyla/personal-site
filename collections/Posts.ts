@@ -34,7 +34,15 @@ export const Posts: CollectionConfig = {
     },
     {
       name: "content",
-      type: "richText",
+      type: "textarea",
+      admin: {
+        components: {
+          Field: "@/components/admin/github-markdown-field#default",
+        },
+        description: "GitHub-flavored Markdown. Use Preview before publishing.",
+        placeholder: "# Article title\n\nWrite GitHub Markdown...",
+        rows: 24,
+      },
     },
     {
       name: "coverImageUrl",

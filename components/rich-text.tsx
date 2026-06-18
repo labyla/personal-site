@@ -1,33 +1,22 @@
-import { RichText as PayloadRichText } from "@payloadcms/richtext-lexical/react"
-
-import type { Project } from "@/payload-types"
+import { renderGitHubMarkdown } from "@/lib/markdown"
 import { cn } from "@/lib/utils"
 
+import styles from "./rich-text.module.css"
+
 type RichTextProps = {
-  data: Project["content"]
+  data: string | null | undefined
   className?: string
 }
 
 export function RichText({ data, className }: RichTextProps) {
-  if (!data) {
+  if (!data?.trim()) {
     return null
   }
 
   return (
-    <PayloadRichText
-      data={data}
-      disableIndent
-      className={cn(
-        "space-y-7 text-base leading-8 text-muted-foreground",
-        "[&_a]:text-foreground [&_a]:underline [&_a]:decoration-accent/60 [&_a]:underline-offset-4 hover:[&_a]:text-accent",
-        "[&_blockquote]:border-l-2 [&_blockquote]:border-accent [&_blockquote]:pl-5 [&_blockquote]:text-foreground",
-        "[&_code]:bg-secondary [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm [&_code]:text-foreground",
-        "[&_h1]:text-4xl [&_h1]:font-bold [&_h1]:uppercase [&_h1]:leading-none [&_h1]:text-foreground",
-        "[&_h2]:border-t [&_h2]:border-border [&_h2]:pt-8 [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:uppercase [&_h2]:leading-none [&_h2]:text-foreground",
-        "[&_h3]:pt-6 [&_h3]:text-2xl [&_h3]:font-bold [&_h3]:uppercase [&_h3]:leading-none [&_h3]:text-foreground",
-        "[&_li]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6",
-        className,
-      )}
+    <div
+      className={cn(styles.root, className)}
+      dangerouslySetInnerHTML={{ __html: renderGitHubMarkdown(data) }}
     />
   )
 }

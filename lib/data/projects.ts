@@ -1,8 +1,6 @@
 import config from "@payload-config"
 import { getPayload } from "payload"
 
-import type { Project } from "@/payload-types"
-
 import { projectSeedItems } from "./project-seed"
 
 export type ProjectListItem = {
@@ -22,7 +20,7 @@ export type ProjectDetail = {
   title: string
   description: string
   excerpt: string
-  content: Project["content"]
+  content: string | null
   imageUrl: string
   tags: string[]
   publishedAt: string | null
@@ -57,7 +55,7 @@ type PayloadProject = {
   title?: string | null
   description?: string | null
   excerpt?: string | null
-  content?: Project["content"]
+  content?: string | null
   imageUrl?: string | null
   tags?: Array<{
     label?: string | null

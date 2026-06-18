@@ -55,7 +55,7 @@ Detail-page fields include:
 - `canonicalUrl`
 - `externalUrl`
 
-Project detail content uses Payload Lexical Rich Text through `@payloadcms/richtext-lexical`. Blocks/page-builder are not used yet. Media upload remains deferred; `imageUrl` is still a string.
+Project detail content uses GitHub-flavored Markdown stored as a Payload `textarea` string. The admin field uses a custom Markdown editor with Edit/Preview modes and a slash helper for common GitHub Markdown snippets. Blocks/page-builder are not used yet. Media upload remains deferred; `imageUrl` is still a string.
 
 Public fetching uses only `status=published` projects. Ordering is `sortOrder`, then `createdAt`, then `title`.
 
@@ -106,7 +106,7 @@ Fields:
 
 Tags/categories are not included yet because the current Blog section UI does not display them.
 
-Posts use the same content architecture as Projects: card/list data is separate from detail content, `content` uses Payload Lexical Rich Text, and public rendering uses `components/rich-text.tsx`.
+Posts use the same content architecture as Projects: card/list data is separate from detail content, `content` stores GitHub-flavored Markdown, and public rendering uses `components/rich-text.tsx`.
 
 Public fetching uses only `status=published` posts. Ordering is `sortOrder`, then `publishedAt`, then `createdAt`, then `title`.
 

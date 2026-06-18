@@ -14,6 +14,7 @@
 - Do not use external CDN scripts, Alpine snippets, Tailwind CDN, or third-party runtime scripts for UI effects.
 - Do not gate public-site animation on `prefers-reduced-motion`; motion should run consistently across OS/browser settings while staying lightweight.
 - Do not revive the tech marquee crossfade between separate auto/manual layers.
+- Do not base the tech/tools marquee auto-motion on native `scrollLeft`; use transform-based movement with duplicated groups.
 - Do not base Testimonials movement on `scrollLeft`; it can hit the physical scroll end and stop.
 - Testimonials normal mode should not allow manual horizontal scroll or show a scrollbar.
 
@@ -31,5 +32,7 @@
 - Collection seed scripts should create missing records and skip existing records by `slug`.
 - `seed:site-settings` should fill missing values and empty arrays, not overwrite populated Payload Admin edits.
 - Keep `imageUrl`, `avatarUrl`, and `coverImageUrl` as strings until media upload work is explicitly approved.
+- Project and Post `content` is GitHub-flavored Markdown stored as a string, not Payload Lexical JSON.
+- Changing existing CMS records from the old Lexical content shape to Markdown requires manual replacement or a migration.
 - Public project, testimonial, and post fetching should use only `status=published`.
 - Project and Blog detail routes should use `notFound()` for missing/unavailable published records, not seed fallbacks.

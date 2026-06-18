@@ -15,7 +15,8 @@ This status reflects the currently accepted project context. Before major change
 - SiteSettings Global groups for Hero, About, CTA, Footer, and Header.
 - Site settings seed script with fill-missing behavior.
 - Posts collection, seed script, home page Blog connection, archive page, and detail pages.
-- Shared Payload Lexical rich text renderer for Projects and Posts.
+- Shared GitHub-like Markdown renderer for Projects and Posts.
+- Payload Admin Markdown editor for Project and Post content with Edit/Preview modes and a slash helper.
 - ContactSubmissions collection and controlled public server action.
 - Public Contact Form UI connected to the server action.
 - Contact form preservation of entered values after server validation errors.
@@ -50,6 +51,7 @@ This status reflects the currently accepted project context. Before major change
 - Activity logs are not implemented.
 - Tags/categories for Posts are not implemented because the current Blog UI does not display them.
 - Blocks/page-builder are not used for Projects or Posts.
+- Existing Project/Post records that still contain old Lexical JSON content need manual replacement or migration to Markdown.
 
 ## Next Likely Work
 
