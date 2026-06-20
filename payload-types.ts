@@ -159,29 +159,77 @@ export interface User {
  */
 export interface Project {
   id: number;
+  /**
+   * Public project title shown in project lists and at the top of the project page.
+   */
   title: string;
+  /**
+   * URL path segment for the project. Example: my-project becomes /projects/my-project.
+   */
   slug: string;
+  /**
+   * Short project summary shown on project cards and used as fallback intro text on the detail page.
+   */
   description: string;
+  /**
+   * Optional detail-page intro. If empty, the public page uses the description.
+   */
   excerpt?: string | null;
   /**
-   * GitHub-flavored Markdown. Paste README.md content here.
+   * Project body in GitHub-flavored Markdown. The Preview tab uses the same renderer as the public project page.
    */
   content?: string | null;
+  /**
+   * Public image URL for the project card and project hero image.
+   */
   imageUrl: string;
+  /**
+   * Short technology or category labels shown beside the project title.
+   */
   tags?:
     | {
+        /**
+         * One visible tag label, such as Next.js or Payload.
+         */
         label: string;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Legacy card link fallback. Internal cards now prefer /projects/[slug]. Usually leave as #.
+   */
   href?: string | null;
+  /**
+   * Optional live project URL. When filled, the project page shows a Visit project button.
+   */
   externalUrl?: string | null;
+  /**
+   * Optional date shown near the project label on the detail page.
+   */
   publishedAt?: string | null;
+  /**
+   * Optional SEO/browser title. If empty, the public page uses the project title.
+   */
   metaTitle?: string | null;
+  /**
+   * Optional SEO description. If empty, the public page uses the excerpt or description.
+   */
   metaDescription?: string | null;
+  /**
+   * Optional canonical URL when this project has another preferred source URL. Usually leave empty.
+   */
   canonicalUrl?: string | null;
+  /**
+   * Editorial flag for highlighted project curation. Public fetching may use it for selected work.
+   */
   featured?: boolean | null;
+  /**
+   * Lower numbers appear first in public project lists. Projects with the same value fall back to creation date.
+   */
   sortOrder?: number | null;
+  /**
+   * Draft projects stay hidden. Published projects can appear on /projects and /projects/[slug].
+   */
   status: 'draft' | 'published';
   updatedAt: string;
   createdAt: string;
@@ -192,21 +240,57 @@ export interface Project {
  */
 export interface Post {
   id: number;
+  /**
+   * Public article title shown on blog cards and at the top of the article page.
+   */
   title: string;
+  /**
+   * URL path segment for the article. Example: my-article becomes /blog/my-article.
+   */
   slug: string;
+  /**
+   * Short summary shown on blog cards and under the article title.
+   */
   excerpt: string;
   /**
-   * GitHub-flavored Markdown. Use Preview before publishing.
+   * Article body in GitHub-flavored Markdown. The Preview tab uses the same renderer as the public article page.
    */
   content?: string | null;
+  /**
+   * Public image URL for the blog card and article hero image.
+   */
   coverImageUrl: string;
+  /**
+   * Small reading-time label shown near the article date. Example: 6 min read.
+   */
   readingTime?: string | null;
+  /**
+   * Publication date shown on the article page and used for ordering after sort order.
+   */
   publishedAt?: string | null;
+  /**
+   * Editorial flag for future curation. The current public blog UI does not filter by this yet.
+   */
   featured?: boolean | null;
+  /**
+   * Lower numbers appear first in public article lists. Posts with the same value fall back to publication date.
+   */
   sortOrder?: number | null;
+  /**
+   * Draft posts stay hidden. Published posts can appear on /blog and /blog/[slug].
+   */
   status: 'draft' | 'published';
+  /**
+   * Optional SEO/browser title. If empty, the public page uses the article title.
+   */
   metaTitle?: string | null;
+  /**
+   * Optional SEO description for search/share previews. If empty, the public page uses the excerpt.
+   */
   metaDescription?: string | null;
+  /**
+   * Optional canonical URL when this article has another preferred source URL. Usually leave empty.
+   */
   canonicalUrl?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -217,14 +301,41 @@ export interface Post {
  */
 export interface Testimonial {
   id: number;
+  /**
+   * Person name shown in the public testimonial card.
+   */
   name: string;
+  /**
+   * Stable internal identifier for this testimonial. It is used by seed scripts, not shown publicly.
+   */
   slug: string;
+  /**
+   * Short role or context line shown under the person's name.
+   */
   role: string;
+  /**
+   * The testimonial text shown in the public card.
+   */
   quote: string;
+  /**
+   * Public avatar image URL shown beside the person's name.
+   */
   avatarUrl: string;
+  /**
+   * Number of accent stars shown in the testimonial card, from 1 to 5.
+   */
   rating: number;
+  /**
+   * Editorial flag for future curation. The current public testimonials UI does not filter by this yet.
+   */
   featured?: boolean | null;
+  /**
+   * Lower numbers appear first in the testimonials marquee. Items with the same value fall back to creation date.
+   */
   sortOrder?: number | null;
+  /**
+   * Draft testimonials stay hidden. Published testimonials can appear on the site.
+   */
   status: 'draft' | 'published';
   updatedAt: string;
   createdAt: string;

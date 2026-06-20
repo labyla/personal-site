@@ -17,64 +17,118 @@ export const Testimonials: CollectionConfig = {
   },
   fields: [
     {
-      name: "name",
-      type: "text",
-      required: true,
-    },
-    {
-      name: "slug",
-      type: "text",
-      required: true,
-      unique: true,
-    },
-    {
-      name: "role",
-      type: "text",
-      required: true,
-    },
-    {
-      name: "quote",
-      type: "textarea",
-      required: true,
-    },
-    {
-      name: "avatarUrl",
-      type: "text",
-      required: true,
-    },
-    {
-      name: "rating",
-      type: "number",
-      defaultValue: 5,
-      max: 5,
-      min: 1,
-      required: true,
-    },
-    {
-      name: "featured",
-      type: "checkbox",
-      defaultValue: false,
-    },
-    {
-      name: "sortOrder",
-      type: "number",
-      defaultValue: 0,
-    },
-    {
-      name: "status",
-      type: "select",
-      defaultValue: "draft",
-      options: [
+      type: "tabs",
+      tabs: [
         {
-          label: "Draft",
-          value: "draft",
+          label: "Edit",
+          fields: [
+            {
+              name: "name",
+              type: "text",
+              admin: {
+                description: "Person name shown in the public testimonial card.",
+              },
+              required: true,
+            },
+            {
+              name: "slug",
+              type: "text",
+              admin: {
+                description:
+                  "Stable internal identifier for this testimonial. It is used by seed scripts, not shown publicly.",
+              },
+              required: true,
+              unique: true,
+            },
+            {
+              name: "role",
+              type: "text",
+              admin: {
+                description: "Short role or context line shown under the person's name.",
+              },
+              required: true,
+            },
+            {
+              name: "quote",
+              type: "textarea",
+              admin: {
+                description: "The testimonial text shown in the public card.",
+              },
+              required: true,
+            },
+            {
+              name: "avatarUrl",
+              type: "text",
+              admin: {
+                description: "Public avatar image URL shown beside the person's name.",
+              },
+              required: true,
+            },
+            {
+              name: "rating",
+              type: "number",
+              admin: {
+                description: "Number of accent stars shown in the testimonial card, from 1 to 5.",
+              },
+              defaultValue: 5,
+              max: 5,
+              min: 1,
+              required: true,
+            },
+            {
+              name: "featured",
+              type: "checkbox",
+              admin: {
+                description:
+                  "Editorial flag for future curation. The current public testimonials UI does not filter by this yet.",
+              },
+              defaultValue: false,
+            },
+            {
+              name: "sortOrder",
+              type: "number",
+              admin: {
+                description:
+                  "Lower numbers appear first in the testimonials marquee. Items with the same value fall back to creation date.",
+              },
+              defaultValue: 0,
+            },
+            {
+              name: "status",
+              type: "select",
+              admin: {
+                description: "Draft testimonials stay hidden. Published testimonials can appear on the site.",
+              },
+              defaultValue: "draft",
+              options: [
+                {
+                  label: "Draft",
+                  value: "draft",
+                },
+                {
+                  label: "Published",
+                  value: "published",
+                },
+              ],
+              required: true,
+            },
+          ],
         },
         {
-          label: "Published",
-          value: "published",
+          label: "Preview",
+          fields: [
+            {
+              name: "testimonialPreview",
+              type: "ui",
+              admin: {
+                components: {
+                  Field: "@/components/admin/testimonial-preview-field#default",
+                },
+              },
+            },
+          ],
         },
       ],
-      required: true,
     },
   ],
 }
