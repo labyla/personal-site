@@ -1,6 +1,8 @@
 import config from "@payload-config"
 import { getPayload } from "payload"
 
+import { resolveMediaUrl } from "@/lib/media"
+
 import { testimonialSeedItems } from "./testimonial-seed"
 
 export type TestimonialListItem = {
@@ -17,7 +19,7 @@ const fallbackTestimonials: TestimonialListItem[] = testimonialSeedItems.map((te
   name: testimonial.name,
   role: testimonial.role,
   quote: testimonial.quote,
-  avatar: testimonial.avatarUrl,
+  avatar: resolveMediaUrl(testimonial.avatarUrl),
   rating: testimonial.rating,
 }))
 
@@ -38,7 +40,7 @@ function mapTestimonial(testimonial: PayloadTestimonial): TestimonialListItem {
     name: testimonial.name || "",
     role: testimonial.role || "",
     quote: testimonial.quote || "",
-    avatar: testimonial.avatarUrl || "",
+    avatar: resolveMediaUrl(testimonial.avatarUrl),
     rating: testimonial.rating || 5,
   }
 }
@@ -77,10 +79,6 @@ export async function getTestimonials(): Promise<TestimonialListItem[]> {
         },
       },
     })
-
-    if (result.docs.length === 0) {
-      return fallbackTestimonials
-    }
 
     return sortTestimonials(result.docs as PayloadTestimonial[]).map(mapTestimonial)
   } catch (error) {

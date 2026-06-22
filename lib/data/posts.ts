@@ -1,6 +1,8 @@
 import config from "@payload-config"
 import { getPayload } from "payload"
 
+import { resolveMediaUrl } from "@/lib/media"
+
 import { postSeedItems } from "./post-seed"
 
 export type BlogPostListItem = {
@@ -33,7 +35,7 @@ const fallbackPosts: BlogPostListItem[] = postSeedItems.map((post) => ({
   slug: post.slug,
   title: post.title,
   excerpt: post.excerpt,
-  image: post.coverImageUrl,
+  image: resolveMediaUrl(post.coverImageUrl),
   date: formatDate(post.publishedAt),
   readTime: post.readingTime,
   href: `/blog/${post.slug}`,
@@ -75,7 +77,7 @@ function mapPost(post: PayloadPost): BlogPostListItem {
     slug,
     title: post.title || "",
     excerpt: post.excerpt || "",
-    image: post.coverImageUrl || "",
+    image: resolveMediaUrl(post.coverImageUrl),
     date: formatDate(post.publishedAt),
     readTime: post.readingTime || "",
     href: slug ? `/blog/${slug}` : "#",
@@ -89,7 +91,7 @@ function mapPostDetail(post: PayloadPost): BlogPostDetail {
     title: post.title || "",
     excerpt: post.excerpt || "",
     content: post.content || null,
-    coverImageUrl: post.coverImageUrl || "",
+    coverImageUrl: resolveMediaUrl(post.coverImageUrl),
     readingTime: post.readingTime || "",
     publishedAt: post.publishedAt || null,
     metaTitle: post.metaTitle || post.title || "",
@@ -138,10 +140,6 @@ export async function getPosts(): Promise<BlogPostListItem[]> {
         },
       },
     })
-
-    if (result.docs.length === 0) {
-      return fallbackPosts
-    }
 
     return sortPosts(result.docs as PayloadPost[]).map(mapPost)
   } catch (error) {

@@ -42,6 +42,7 @@ export type HeroSettings = {
   badgeLabel: string
   badgeText: string
   badgeHref: string
+  availabilityLabel: string
   headlinePrefix: string
   headlineAccent: string
   headlineSuffix: string
@@ -55,12 +56,15 @@ export type HeroSettings = {
   primaryCtaHref: string
   secondaryCtaLabel: string
   secondaryCtaHref: string
+  focusLabel: string
+  focusText: string
 }
 
 export const heroSeed: HeroSettings = {
   badgeLabel: "New",
   badgeText: "Keythm — feel every keystroke",
   badgeHref: "#work",
+  availabilityLabel: "Available for selected builds",
   headlinePrefix: "Code that ",
   headlineAccent: "feels",
   headlineSuffix: " designed.",
@@ -74,6 +78,162 @@ export const heroSeed: HeroSettings = {
   primaryCtaHref: "#contact",
   secondaryCtaLabel: "hello@aayushbharti.in",
   secondaryCtaHref: "mailto:hello@aayushbharti.in",
+  focusLabel: "Focus",
+  focusText:
+    "Frontend systems, product interfaces, motion-light interaction, and CMS-backed sites that stay clean after launch.",
+}
+
+export type BentoSettings = {
+  buildEyebrow: string
+  buildText: string
+  buildHref: string
+  stackEyebrow: string
+  stackText: string
+  stackHref: string
+  stackTags: string[]
+  projectsEyebrow: string
+  projectsValue: string
+  projectsText: string
+  workflowEyebrow: string
+  workflowText: string
+  workflowHref: string
+  experienceEyebrow: string
+  experienceValue: string
+}
+
+export const bentoSeed: BentoSettings = {
+  buildEyebrow: "LET'S BUILD TOGETHER",
+  buildText: "Clear communication, fast iterations, no surprises",
+  buildHref: "#contact",
+  stackEyebrow: "THE STACK",
+  stackText: "What you see, pixel-perfect UI, elegance in motion.",
+  stackHref: "#tools",
+  stackTags: ["React", "Next.js", "TypeScript"],
+  projectsEyebrow: "PROJECTS",
+  projectsValue: "20+",
+  projectsText: "Globally shipped",
+  workflowEyebrow: "WORKFLOW",
+  workflowText: "Check out my favorite tools",
+  workflowHref: "#tools",
+  experienceEyebrow: "EXPERIENCE",
+  experienceValue: "4+ Years",
+}
+
+export type ExperienceSettings = {
+  eyebrow: string
+  title: string
+}
+
+export const experienceSeed: ExperienceSettings = {
+  eyebrow: "MY EXPERIENCE",
+  title: "Scroll through the build record.",
+}
+
+export type HomeProjectsSettings = {
+  eyebrow: string
+  title: string
+  archiveCtaLabel: string
+  archiveCtaHref: string
+}
+
+export const homeProjectsSeed: HomeProjectsSettings = {
+  eyebrow: "FEATURED PROJECTS",
+  title: "Selected work, built to hold up.",
+  archiveCtaLabel: "See more projects",
+  archiveCtaHref: "/projects",
+}
+
+export type HomeBlogSettings = {
+  eyebrow: string
+  title: string
+  description: string
+  archiveCtaLabel: string
+  archiveCtaHref: string
+}
+
+export const homeBlogSeed: HomeBlogSettings = {
+  eyebrow: "LATEST ARTICLES",
+  title: "Notes from the build floor.",
+  description:
+    "Short reads on frontend craft, product clarity, and the practical details behind durable interfaces.",
+  archiveCtaLabel: "Read more articles",
+  archiveCtaHref: "/blog",
+}
+
+export type TestimonialsSectionSettings = {
+  eyebrow: string
+  title: string
+}
+
+export const testimonialsSectionSeed: TestimonialsSectionSettings = {
+  eyebrow: "TESTIMONIALS",
+  title: "Word on the street",
+}
+
+export type TechStackSettings = {
+  eyebrow: string
+  title: string
+  description: string
+  skillsEyebrow: string
+  skillsTitle: string
+  toolsEyebrow: string
+  toolsTitle: string
+}
+
+export const techStackSeed: TechStackSettings = {
+  eyebrow: "STACK",
+  title: "Tech stack",
+  description: "The languages, frameworks, and daily tools I use to build and ship.",
+  skillsEyebrow: "01",
+  skillsTitle: "Skills",
+  toolsEyebrow: "02",
+  toolsTitle: "Tools",
+}
+
+export type ContactSettings = {
+  eyebrow: string
+  title: string
+  description: string
+  submitLabel: string
+}
+
+export const contactSeed: ContactSettings = {
+  eyebrow: "CONTACT",
+  title: "Let's make something useful.",
+  description:
+    "Tell me what you are building, what feels stuck, or where you need another pair of hands. I'll get back to you as soon as I can.",
+  submitLabel: "Send message",
+}
+
+export type ArchivePageSettings = {
+  backLabel: string
+  backHref: string
+  eyebrow: string
+  title: string
+  description: string
+  footerCtaLabel: string
+  footerCtaHref: string
+}
+
+export const projectsPageSeed: ArchivePageSettings = {
+  backLabel: "Back home",
+  backHref: "/#work",
+  eyebrow: "PROJECTS",
+  title: "All projects",
+  description: "A closer look at selected product, engineering, and interface work.",
+  footerCtaLabel: "Back to selected work",
+  footerCtaHref: "/#work",
+}
+
+export const blogPageSeed: ArchivePageSettings = {
+  backLabel: "Back home",
+  backHref: "/#blog",
+  eyebrow: "ARTICLES",
+  title: "All articles",
+  description:
+    "Notes on building, shipping, tools, and the details that make web products feel better.",
+  footerCtaLabel: "Back to latest articles",
+  footerCtaHref: "/#blog",
 }
 
 export type SocialPlatform = "github" | "twitter" | "linkedin" | "instagram"

@@ -5,8 +5,10 @@ import { Quote, Star } from "lucide-react"
 import Image from "next/image"
 
 import type { TestimonialListItem } from "@/lib/data/testimonials"
+import type { TestimonialsSectionSettings } from "@/lib/data/site-settings-seed"
 
 type TestimonialsProps = {
+  section: TestimonialsSectionSettings
   testimonials: TestimonialListItem[]
 }
 
@@ -50,7 +52,7 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialListItem }) 
   )
 }
 
-export function Testimonials({ testimonials }: TestimonialsProps) {
+export function Testimonials({ section, testimonials }: TestimonialsProps) {
   const trackRef = useRef<HTMLDivElement>(null)
   const groupRef = useRef<HTMLDivElement>(null)
   const frameRef = useRef<number | null>(null)
@@ -216,9 +218,11 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
       <div className="mx-auto max-w-6xl px-4">
         <div className="mb-10 md:mb-14">
           <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            TESTIMONIALS
+            {section.eyebrow}
           </p>
-          <h2 className="text-4xl font-bold uppercase leading-none md:text-6xl">Word on the street</h2>
+          <h2 className="text-4xl font-bold uppercase leading-none md:text-6xl">
+            {section.title}
+          </h2>
         </div>
       </div>
 

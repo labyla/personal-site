@@ -4,7 +4,13 @@ import { motion } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 import Link from "next/link"
 
-export function BentoGrid() {
+import type { BentoSettings } from "@/lib/data/site-settings-seed"
+
+type BentoGridProps = {
+  bento: BentoSettings
+}
+
+export function BentoGrid({ bento }: BentoGridProps) {
   return (
     <section className="px-4 py-16 md:py-20">
       <div className="max-w-6xl mx-auto">
@@ -18,16 +24,16 @@ export function BentoGrid() {
             className="col-span-1 md:col-span-2 relative group"
           >
             <Link
-              href="#contact"
+              href={bento.buildHref}
               className="block h-full border border-accent/30 bg-accent/10 p-6 transition-colors hover:border-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <div className="flex flex-col h-full justify-between min-h-[200px]">
                 <div>
                   <p className="text-xs text-accent font-medium mb-2 uppercase tracking-wider">
-                    {"LET'S BUILD TOGETHER"}
+                    {bento.buildEyebrow}
                   </p>
                   <p className="text-muted-foreground">
-                    Clear communication, fast iterations, no surprises
+                    {bento.buildText}
                   </p>
                 </div>
                 <ArrowUpRight className="w-5 h-5 text-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
@@ -41,21 +47,31 @@ export function BentoGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="col-span-1 relative"
+            className="col-span-1 relative group"
           >
-            <div className="h-full border border-border bg-card/80 p-6">
-              <p className="text-xs text-muted-foreground font-medium mb-4 uppercase tracking-wider">
-                THE STACK
-              </p>
-              <p className="text-sm text-muted-foreground mb-4">
-                {"What you see, pixel-perfect UI, elegance in motion."}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="border border-border bg-secondary px-2 py-1 text-xs">React</span>
-                <span className="border border-border bg-secondary px-2 py-1 text-xs">Next.js</span>
-                <span className="border border-border bg-secondary px-2 py-1 text-xs">TypeScript</span>
+            <Link
+              href={bento.stackHref}
+              className="block h-full border border-border bg-card/80 p-6 transition-colors hover:border-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <div className="flex min-h-[200px] flex-col justify-between gap-5">
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium mb-4 uppercase tracking-wider transition-colors group-hover:text-accent">
+                    {bento.stackEyebrow}
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {bento.stackText}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {bento.stackTags.map((tag) => (
+                      <span key={tag} className="border border-border bg-secondary px-2 py-1 text-xs">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <ArrowUpRight className="w-5 h-5 text-muted-foreground transition-all group-hover:text-foreground group-hover:translate-x-1 group-hover:-translate-y-1" />
               </div>
-            </div>
+            </Link>
           </motion.div>
 
           {/* Available for hire card */}
@@ -69,11 +85,11 @@ export function BentoGrid() {
             <div className="flex h-full flex-col justify-between border border-border bg-card/80 p-6">
               <div>
                 <p className="text-xs text-muted-foreground font-medium mb-2 uppercase tracking-wider">
-                  PROJECTS
+                  {bento.projectsEyebrow}
                 </p>
-                <p className="font-semibold text-3xl">20+</p>
+                <p className="font-semibold text-3xl">{bento.projectsValue}</p>
               </div>
-              <p className="text-sm text-muted-foreground">Globally shipped</p>
+              <p className="text-sm text-muted-foreground">{bento.projectsText}</p>
             </div>
           </motion.div>
 
@@ -86,15 +102,15 @@ export function BentoGrid() {
             className="col-span-1 md:col-span-2 relative group"
           >
             <Link
-              href="#tools"
+              href={bento.workflowHref}
               className="block h-full border border-border bg-card/80 p-6 transition-colors hover:border-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-xs text-muted-foreground font-medium mb-2 uppercase tracking-wider">
-                    WORKFLOW
+                    {bento.workflowEyebrow}
                   </p>
-                  <p className="text-foreground font-medium">Check out my favorite tools</p>
+                  <p className="text-foreground font-medium">{bento.workflowText}</p>
                 </div>
                 <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
               </div>
@@ -113,9 +129,9 @@ export function BentoGrid() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground font-medium mb-2 uppercase tracking-wider">
-                    EXPERIENCE
+                    {bento.experienceEyebrow}
                   </p>
-                  <p className="font-semibold text-3xl">4+ Years</p>
+                  <p className="font-semibold text-3xl">{bento.experienceValue}</p>
                 </div>
                 <div className="flex -space-x-2">
                   {[1, 2, 3].map((i) => (

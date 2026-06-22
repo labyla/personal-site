@@ -6,12 +6,14 @@ import Image from "next/image"
 import Link from "next/link"
 
 import type { BlogPostListItem } from "@/lib/data/posts"
+import type { HomeBlogSettings } from "@/lib/data/site-settings-seed"
 
 type BlogProps = {
   posts: BlogPostListItem[]
+  section: HomeBlogSettings
 }
 
-export function Blog({ posts }: BlogProps) {
+export function Blog({ posts, section }: BlogProps) {
   return (
     <section id="blog" className="border-y border-border bg-card/20 px-4 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
@@ -23,15 +25,14 @@ export function Blog({ posts }: BlogProps) {
         >
           <div>
             <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              LATEST ARTICLES
+              {section.eyebrow}
             </p>
             <h2 className="max-w-3xl text-4xl font-bold uppercase leading-none md:text-6xl">
-              Notes from the build floor.
+              {section.title}
             </h2>
           </div>
           <p className="text-sm leading-7 text-muted-foreground">
-            Short reads on frontend craft, product clarity, and the practical
-            details behind durable interfaces.
+            {section.description}
           </p>
         </motion.div>
 
@@ -98,10 +99,10 @@ export function Blog({ posts }: BlogProps) {
           className="text-center mt-12"
         >
           <Link
-            href="/blog"
+            href={section.archiveCtaHref}
             className="inline-flex items-center gap-2 border border-border bg-secondary px-5 py-3 text-sm transition-colors hover:border-accent/40 hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            Read more articles
+            {section.archiveCtaLabel}
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </motion.div>

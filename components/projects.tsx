@@ -7,13 +7,15 @@ import Image from "next/image"
 import Link from "next/link"
 
 import type { ProjectListItem } from "@/lib/data/projects"
+import type { HomeProjectsSettings } from "@/lib/data/site-settings-seed"
 import { cn } from "@/lib/utils"
 
 type ProjectsProps = {
   projects: ProjectListItem[]
+  section: HomeProjectsSettings
 }
 
-export function Projects({ projects }: ProjectsProps) {
+export function Projects({ projects, section }: ProjectsProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const previewRef = useRef<HTMLDivElement>(null)
   const activeProject = activeIndex === null ? null : projects[activeIndex]
@@ -40,10 +42,10 @@ export function Projects({ projects }: ProjectsProps) {
           className="mb-12 border-t border-border pt-8 md:mb-16"
         >
           <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            FEATURED PROJECTS
+            {section.eyebrow}
           </p>
           <h2 className="max-w-3xl text-4xl font-bold uppercase leading-none md:text-6xl">
-            Selected work, built to hold up.
+            {section.title}
           </h2>
         </motion.div>
 
@@ -181,10 +183,10 @@ export function Projects({ projects }: ProjectsProps) {
           className="mt-10"
         >
           <Link
-            href="/projects"
+            href={section.archiveCtaHref}
             className="inline-flex items-center gap-2 border border-border bg-secondary px-5 py-3 text-sm transition-colors hover:border-accent/40 hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            See more projects
+            {section.archiveCtaLabel}
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </motion.div>

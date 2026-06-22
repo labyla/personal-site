@@ -60,7 +60,11 @@ export const Testimonials: CollectionConfig = {
               name: "avatarUrl",
               type: "text",
               admin: {
-                description: "Public avatar image URL shown beside the person's name.",
+                components: {
+                  Field: "@/components/admin/local-media-field#default",
+                },
+                description:
+                  "Public avatar image URL shown beside the person's name. Use local: to choose from the local media library.",
               },
               required: true,
             },

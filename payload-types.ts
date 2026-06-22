@@ -68,9 +68,12 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    media: Media;
     projects: Project;
     posts: Post;
     testimonials: Testimonial;
+    'experience-items': ExperienceItem;
+    'tech-stack-items': TechStackItem;
     'contact-submissions': ContactSubmission;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -80,9 +83,12 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    'experience-items': ExperienceItemsSelect<false> | ExperienceItemsSelect<true>;
+    'tech-stack-items': TechStackItemsSelect<false> | TechStackItemsSelect<true>;
     'contact-submissions': ContactSubmissionsSelect<false> | ContactSubmissionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -155,6 +161,55 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  /**
+   * Folder entries group files. File entries are uploaded media assets.
+   */
+  kind: 'file' | 'folder';
+  /**
+   * Visible name shown in the local media manager.
+   */
+  name?: string | null;
+  /**
+   * Parent folder. Leave empty for the media root.
+   */
+  parent?: (number | null) | Media;
+  /**
+   * URL-safe folder segment. Leave empty to generate from the folder name.
+   */
+  slug?: string | null;
+  /**
+   * Unique local path. Use this as local:/path/to/file.ext in URL fields or Markdown.
+   */
+  path?: string | null;
+  /**
+   * Original uploaded filename.
+   */
+  filename?: string | null;
+  /**
+   * Stored filename under public/media.
+   */
+  storageFilename?: string | null;
+  /**
+   * Public URL for the stored media file.
+   */
+  url?: string | null;
+  /**
+   * Uploaded file MIME type.
+   */
+  mimeType?: string | null;
+  /**
+   * Uploaded file size in bytes.
+   */
+  filesize?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "projects".
  */
 export interface Project {
@@ -180,7 +235,7 @@ export interface Project {
    */
   content?: string | null;
   /**
-   * Public image URL for the project card and project hero image.
+   * Public image URL for the project card and project hero image. Use local: to choose from the local media library.
    */
   imageUrl: string;
   /**
@@ -257,7 +312,7 @@ export interface Post {
    */
   content?: string | null;
   /**
-   * Public image URL for the blog card and article hero image.
+   * Public image URL for the blog card and article hero image. Use local: to choose from the local media library.
    */
   coverImageUrl: string;
   /**
@@ -318,7 +373,7 @@ export interface Testimonial {
    */
   quote: string;
   /**
-   * Public avatar image URL shown beside the person's name.
+   * Public avatar image URL shown beside the person's name. Use local: to choose from the local media library.
    */
   avatarUrl: string;
   /**
@@ -335,6 +390,80 @@ export interface Testimonial {
   sortOrder?: number | null;
   /**
    * Draft testimonials stay hidden. Published testimonials can appear on the site.
+   */
+  status: 'draft' | 'published';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "experience-items".
+ */
+export interface ExperienceItem {
+  id: number;
+  /**
+   * Company, client group, or context shown in the experience timeline.
+   */
+  company: string;
+  /**
+   * Stable internal identifier used by seed scripts. It is not shown publicly.
+   */
+  slug: string;
+  /**
+   * Role or type of work shown as the main item title.
+   */
+  role: string;
+  /**
+   * Date range shown beside this experience item.
+   */
+  period: string;
+  /**
+   * Short explanation of what happened in this experience item.
+   */
+  description: string;
+  /**
+   * Lower numbers appear first in the homepage experience timeline.
+   */
+  sortOrder?: number | null;
+  /**
+   * Draft items stay hidden. Published items can appear in the homepage experience timeline.
+   */
+  status: 'draft' | 'published';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tech-stack-items".
+ */
+export interface TechStackItem {
+  id: number;
+  /**
+   * Visible skill/tool label shown on marquee chips and stack cards.
+   */
+  name: string;
+  /**
+   * Stable internal identifier used by seed scripts. It is not shown publicly.
+   */
+  slug: string;
+  /**
+   * Choose whether this item appears in the Skills group or the Tools group.
+   */
+  group: 'skill' | 'tool';
+  /**
+   * SVG icon URL used on public chips/cards. Use an external SVG URL or local media reference.
+   */
+  icon: string;
+  /**
+   * Accent color used on hover. Pick a color or enter a CSS color manually.
+   */
+  color: string;
+  /**
+   * Lower numbers appear first inside their Skills or Tools group.
+   */
+  sortOrder?: number | null;
+  /**
+   * Draft items stay hidden. Published items can appear in the homepage marquee and stack section.
    */
   status: 'draft' | 'published';
   updatedAt: string;
@@ -385,6 +514,10 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
         relationTo: 'projects';
         value: number | Project;
       } | null)
@@ -395,6 +528,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'testimonials';
         value: number | Testimonial;
+      } | null)
+    | ({
+        relationTo: 'experience-items';
+        value: number | ExperienceItem;
+      } | null)
+    | ({
+        relationTo: 'tech-stack-items';
+        value: number | TechStackItem;
       } | null)
     | ({
         relationTo: 'contact-submissions';
@@ -467,6 +608,24 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  kind?: T;
+  name?: T;
+  parent?: T;
+  slug?: T;
+  path?: T;
+  filename?: T;
+  storageFilename?: T;
+  url?: T;
+  mimeType?: T;
+  filesize?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "projects_select".
  */
 export interface ProjectsSelect<T extends boolean = true> {
@@ -534,6 +693,36 @@ export interface TestimonialsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "experience-items_select".
+ */
+export interface ExperienceItemsSelect<T extends boolean = true> {
+  company?: T;
+  slug?: T;
+  role?: T;
+  period?: T;
+  description?: T;
+  sortOrder?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tech-stack-items_select".
+ */
+export interface TechStackItemsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  group?: T;
+  icon?: T;
+  color?: T;
+  sortOrder?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contact-submissions_select".
  */
 export interface ContactSubmissionsSelect<T extends boolean = true> {
@@ -593,97 +782,563 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface SiteSetting {
   id: number;
+  /**
+   * Global site header: logo text, navigation links, and the header CTA.
+   */
   header?: {
+    /**
+     * Short brand mark shown in the header.
+     */
     logoText?: string | null;
+    /**
+     * Header navigation links shown across the site.
+     */
     navLinks?:
       | {
+          /**
+           * Visible link text.
+           */
           label?: string | null;
+          /**
+           * Link target. Use /path for site pages, #section for homepage anchors, or a full URL.
+           */
           href?: string | null;
           id?: string | null;
         }[]
       | null;
+    /**
+     * Visible text for the header call-to-action link.
+     */
     ctaLabel?: string | null;
+    /**
+     * Target for the header call-to-action link.
+     */
     ctaHref?: string | null;
   };
+  /**
+   * First screen of the homepage: badge, headline, profile, and main CTAs.
+   */
   hero: {
+    /**
+     * Short label in the small hero badge, such as New.
+     */
     badgeLabel: string;
+    /**
+     * Main text inside the hero badge.
+     */
     badgeText: string;
+    /**
+     * Target opened when the hero badge is clicked.
+     */
     badgeHref: string;
+    /**
+     * Small availability line shown in the hero profile area.
+     */
+    availabilityLabel?: string | null;
+    /**
+     * First part of the large hero headline before the accent word.
+     */
     headlinePrefix: string;
+    /**
+     * Accent word in the large hero headline.
+     */
     headlineAccent: string;
+    /**
+     * Text after the accent word in the large hero headline.
+     */
     headlineSuffix: string;
+    /**
+     * Second line below the main hero headline.
+     */
     headlineSubline: string;
+    /**
+     * Small intro before the name, such as Hello, I'm.
+     */
     introPrefix: string;
+    /**
+     * Name shown in the hero profile line.
+     */
     name: string;
+    /**
+     * Role shown after the name in the hero profile line.
+     */
     role: string;
+    /**
+     * Contact email displayed by the secondary hero CTA.
+     */
     email: string;
+    /**
+     * Public image URL for the small hero avatar. Use local: to choose from the local media library.
+     */
     avatarUrl: string;
+    /**
+     * Visible text for the main hero button.
+     */
     primaryCtaLabel: string;
+    /**
+     * Target for the main hero button.
+     */
     primaryCtaHref: string;
+    /**
+     * Visible text for the secondary hero link, usually the email.
+     */
     secondaryCtaLabel: string;
+    /**
+     * Target for the secondary hero link, usually a mailto: URL.
+     */
     secondaryCtaHref: string;
+    /**
+     * Small label above the hero focus statement.
+     */
+    focusLabel?: string | null;
+    /**
+     * Short statement explaining the kind of work highlighted in the hero.
+     */
+    focusText?: string | null;
   };
-  about?: {
+  /**
+   * Compact homepage grid below the hero: build CTA, stack tags, stats, and workflow.
+   */
+  bento?: {
+    /**
+     * Small label for the build CTA card.
+     */
+    buildEyebrow?: string | null;
+    /**
+     * Main text in the build CTA card.
+     */
+    buildText?: string | null;
+    /**
+     * Target for the build CTA card.
+     */
+    buildHref?: string | null;
+    /**
+     * Small label for the stack card.
+     */
+    stackEyebrow?: string | null;
+    /**
+     * Short sentence shown in the stack card.
+     */
+    stackText?: string | null;
+    /**
+     * Target for the stack card.
+     */
+    stackHref?: string | null;
+    /**
+     * Short labels shown as stack chips in the bento grid.
+     */
+    stackTags?:
+      | {
+          /**
+           * One stack chip label.
+           */
+          label?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Small label for the project-count card.
+     */
+    projectsEyebrow?: string | null;
+    /**
+     * Large project-count value shown in the card.
+     */
+    projectsValue?: string | null;
+    /**
+     * Caption below the project-count value.
+     */
+    projectsText?: string | null;
+    /**
+     * Small label for the workflow/tools card.
+     */
+    workflowEyebrow?: string | null;
+    /**
+     * Main text in the workflow/tools card.
+     */
+    workflowText?: string | null;
+    /**
+     * Target for the workflow/tools card.
+     */
+    workflowHref?: string | null;
+    /**
+     * Small label for the experience stat card.
+     */
+    experienceEyebrow?: string | null;
+    /**
+     * Large experience value shown in the stat card.
+     */
+    experienceValue?: string | null;
+  };
+  /**
+   * Homepage experience section heading. Individual experience items are edited separately.
+   */
+  experience?: {
+    /**
+     * Small uppercase label above the experience heading.
+     */
     eyebrow?: string | null;
+    /**
+     * Main heading for the experience section.
+     */
+    title?: string | null;
+  };
+  /**
+   * Homepage heading and archive link for the selected projects section.
+   */
+  homeProjects?: {
+    /**
+     * Small uppercase label above selected projects.
+     */
+    eyebrow?: string | null;
+    /**
+     * Main heading for the selected projects section.
+     */
+    title?: string | null;
+    /**
+     * Text for the link to the full projects page.
+     */
+    archiveCtaLabel?: string | null;
+    /**
+     * Target for the full projects link.
+     */
+    archiveCtaHref?: string | null;
+  };
+  /**
+   * Homepage heading, intro, and archive link for latest articles.
+   */
+  homeBlog?: {
+    /**
+     * Small uppercase label above latest articles.
+     */
+    eyebrow?: string | null;
+    /**
+     * Main heading for the latest articles section.
+     */
+    title?: string | null;
+    /**
+     * Short intro text shown near the latest articles heading.
+     */
+    description?: string | null;
+    /**
+     * Text for the link to the full blog page.
+     */
+    archiveCtaLabel?: string | null;
+    /**
+     * Target for the full blog link.
+     */
+    archiveCtaHref?: string | null;
+  };
+  /**
+   * Homepage about/profile section.
+   */
+  about?: {
+    /**
+     * Small uppercase label above the about heading.
+     */
+    eyebrow?: string | null;
+    /**
+     * First part of the about title.
+     */
     titlePrefix?: string | null;
+    /**
+     * Muted text segment in the about title.
+     */
     titleMuted?: string | null;
+    /**
+     * About section paragraphs shown in order.
+     */
     paragraphs?:
       | {
+          /**
+           * One paragraph of about/profile copy.
+           */
           text?: string | null;
           id?: string | null;
         }[]
       | null;
+    /**
+     * Public image URL shown in the about section. Use local: to choose from the local media library.
+     */
     imageUrl?: string | null;
+    /**
+     * Accessible alt text for the about image.
+     */
     imageAlt?: string | null;
+    /**
+     * Social links shown in the about section.
+     */
     socialLinks?:
       | {
+          /**
+           * Icon/platform used for this social link.
+           */
           platform?: ('github' | 'twitter' | 'linkedin' | 'instagram') | null;
+          /**
+           * Visible link text.
+           */
           label?: string | null;
+          /**
+           * Link target. Use /path for site pages, #section for homepage anchors, or a full URL.
+           */
           href?: string | null;
           id?: string | null;
         }[]
       | null;
   };
-  cta?: {
-    isEnabled?: boolean | null;
-    avatarLetter?: string | null;
-    titlePrefix?: string | null;
-    titleAccent?: string | null;
-    titleMiddle?: string | null;
-    titleSuffix?: string | null;
-    name?: string | null;
-    availability?: string | null;
+  /**
+   * Homepage testimonials section heading. Individual testimonials are edited separately.
+   */
+  testimonialsSection?: {
+    /**
+     * Small uppercase label above testimonials.
+     */
+    eyebrow?: string | null;
+    /**
+     * Main heading for the testimonials section.
+     */
+    title?: string | null;
+  };
+  /**
+   * Homepage skills/tools section heading. Skill and tool items are edited in Tech Stack Items.
+   */
+  techStack?: {
+    /**
+     * Small uppercase label above the tech stack heading.
+     */
+    eyebrow?: string | null;
+    /**
+     * Main heading for the tech stack section.
+     */
+    title?: string | null;
+    /**
+     * Short intro text for the tech stack section.
+     */
     description?: string | null;
+    /**
+     * Small label shown above the skills group title.
+     */
+    skillsEyebrow?: string | null;
+    /**
+     * Heading for the skills group.
+     */
+    skillsTitle?: string | null;
+    /**
+     * Small label shown above the tools group title.
+     */
+    toolsEyebrow?: string | null;
+    /**
+     * Heading for the tools group.
+     */
+    toolsTitle?: string | null;
+  };
+  /**
+   * Homepage call-to-action section before the footer.
+   */
+  cta?: {
+    /**
+     * Turn this CTA section on or off on the public homepage.
+     */
+    isEnabled?: boolean | null;
+    /**
+     * Single character shown in the CTA avatar mark.
+     */
+    avatarLetter?: string | null;
+    /**
+     * First part of the CTA title.
+     */
+    titlePrefix?: string | null;
+    /**
+     * Accent word in the CTA title.
+     */
+    titleAccent?: string | null;
+    /**
+     * Middle text in the CTA title.
+     */
+    titleMiddle?: string | null;
+    /**
+     * Last part of the CTA title.
+     */
+    titleSuffix?: string | null;
+    /**
+     * Name shown in the CTA profile line.
+     */
+    name?: string | null;
+    /**
+     * Short availability/status line in the CTA.
+     */
+    availability?: string | null;
+    /**
+     * Supporting CTA copy.
+     */
+    description?: string | null;
+    /**
+     * Visible text for the CTA button.
+     */
     primaryCtaLabel?: string | null;
+    /**
+     * Target for the CTA button.
+     */
     primaryCtaHref?: string | null;
   };
-  footer?: {
-    brandInitial?: string | null;
-    brandName?: string | null;
+  /**
+   * Homepage contact form heading and submit button text.
+   */
+  contact?: {
+    /**
+     * Small uppercase label above the contact form heading.
+     */
+    eyebrow?: string | null;
+    /**
+     * Main heading above the contact form.
+     */
+    title?: string | null;
+    /**
+     * Short intro text beside the contact form.
+     */
     description?: string | null;
+    /**
+     * Text shown on the contact form submit button.
+     */
+    submitLabel?: string | null;
+  };
+  /**
+   * Global site footer: brand text, footer link columns, and social links.
+   */
+  footer?: {
+    /**
+     * Single character shown in the footer brand mark.
+     */
+    brandInitial?: string | null;
+    /**
+     * Brand/name shown in the footer.
+     */
+    brandName?: string | null;
+    /**
+     * Short footer description below the brand.
+     */
+    description?: string | null;
+    /**
+     * Name used in the copyright line.
+     */
     copyrightName?: string | null;
+    /**
+     * Primary footer links.
+     */
     mainLinks?:
       | {
+          /**
+           * Visible link text.
+           */
           label?: string | null;
+          /**
+           * Link target. Use /path for site pages, #section for homepage anchors, or a full URL.
+           */
           href?: string | null;
           id?: string | null;
         }[]
       | null;
+    /**
+     * Footer links related to work/projects/contact.
+     */
     workLinks?:
       | {
+          /**
+           * Visible link text.
+           */
           label?: string | null;
+          /**
+           * Link target. Use /path for site pages, #section for homepage anchors, or a full URL.
+           */
           href?: string | null;
           id?: string | null;
         }[]
       | null;
+    /**
+     * Footer social/contact links.
+     */
     socialLinks?:
       | {
+          /**
+           * Icon/platform used for this footer link.
+           */
           platform?: ('email' | 'github' | 'twitter' | 'linkedin' | 'instagram') | null;
+          /**
+           * Visible link text.
+           */
           label?: string | null;
+          /**
+           * Link target. Use /path for site pages, #section for homepage anchors, or a full URL.
+           */
           href?: string | null;
           id?: string | null;
         }[]
       | null;
+  };
+  /**
+   * Text controls for the /projects archive page.
+   */
+  projectsPage?: {
+    /**
+     * Text for the small back link at the top of the archive page.
+     */
+    backLabel?: string | null;
+    /**
+     * Target for the back link. Usually a homepage section such as /#work or /#blog.
+     */
+    backHref?: string | null;
+    /**
+     * Small uppercase label above the archive page title.
+     */
+    eyebrow?: string | null;
+    /**
+     * Main heading shown at the top of the archive page.
+     */
+    title?: string | null;
+    /**
+     * Short intro copy below the archive page heading.
+     */
+    description?: string | null;
+    /**
+     * Text for the footer link shown after the archive list, where the page uses one.
+     */
+    footerCtaLabel?: string | null;
+    /**
+     * Target for the archive footer link.
+     */
+    footerCtaHref?: string | null;
+  };
+  /**
+   * Text controls for the /blog archive page.
+   */
+  blogPage?: {
+    /**
+     * Text for the small back link at the top of the archive page.
+     */
+    backLabel?: string | null;
+    /**
+     * Target for the back link. Usually a homepage section such as /#work or /#blog.
+     */
+    backHref?: string | null;
+    /**
+     * Small uppercase label above the archive page title.
+     */
+    eyebrow?: string | null;
+    /**
+     * Main heading shown at the top of the archive page.
+     */
+    title?: string | null;
+    /**
+     * Short intro copy below the archive page heading.
+     */
+    description?: string | null;
+    /**
+     * Text for the footer link shown after the archive list, where the page uses one.
+     */
+    footerCtaLabel?: string | null;
+    /**
+     * Target for the archive footer link.
+     */
+    footerCtaHref?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -713,6 +1368,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         badgeLabel?: T;
         badgeText?: T;
         badgeHref?: T;
+        availabilityLabel?: T;
         headlinePrefix?: T;
         headlineAccent?: T;
         headlineSuffix?: T;
@@ -726,6 +1382,55 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         primaryCtaHref?: T;
         secondaryCtaLabel?: T;
         secondaryCtaHref?: T;
+        focusLabel?: T;
+        focusText?: T;
+      };
+  bento?:
+    | T
+    | {
+        buildEyebrow?: T;
+        buildText?: T;
+        buildHref?: T;
+        stackEyebrow?: T;
+        stackText?: T;
+        stackHref?: T;
+        stackTags?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+        projectsEyebrow?: T;
+        projectsValue?: T;
+        projectsText?: T;
+        workflowEyebrow?: T;
+        workflowText?: T;
+        workflowHref?: T;
+        experienceEyebrow?: T;
+        experienceValue?: T;
+      };
+  experience?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+      };
+  homeProjects?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        archiveCtaLabel?: T;
+        archiveCtaHref?: T;
+      };
+  homeBlog?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        archiveCtaLabel?: T;
+        archiveCtaHref?: T;
       };
   about?:
     | T
@@ -750,6 +1455,23 @@ export interface SiteSettingsSelect<T extends boolean = true> {
               id?: T;
             };
       };
+  testimonialsSection?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+      };
+  techStack?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        skillsEyebrow?: T;
+        skillsTitle?: T;
+        toolsEyebrow?: T;
+        toolsTitle?: T;
+      };
   cta?:
     | T
     | {
@@ -764,6 +1486,14 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         description?: T;
         primaryCtaLabel?: T;
         primaryCtaHref?: T;
+      };
+  contact?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        submitLabel?: T;
       };
   footer?:
     | T
@@ -794,6 +1524,28 @@ export interface SiteSettingsSelect<T extends boolean = true> {
               href?: T;
               id?: T;
             };
+      };
+  projectsPage?:
+    | T
+    | {
+        backLabel?: T;
+        backHref?: T;
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        footerCtaLabel?: T;
+        footerCtaHref?: T;
+      };
+  blogPage?:
+    | T
+    | {
+        backLabel?: T;
+        backHref?: T;
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        footerCtaLabel?: T;
+        footerCtaHref?: T;
       };
   updatedAt?: T;
   createdAt?: T;

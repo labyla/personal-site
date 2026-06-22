@@ -31,7 +31,8 @@
 - Do not overwrite Payload-edited content with seed scripts.
 - Collection seed scripts should create missing records and skip existing records by `slug`.
 - `seed:site-settings` should fill missing values and empty arrays, not overwrite populated Payload Admin edits.
-- Keep `imageUrl`, `avatarUrl`, and `coverImageUrl` as strings until media upload work is explicitly approved.
+- Keep `imageUrl`, `avatarUrl`, and `coverImageUrl` as strings. They may contain regular external URLs or `local:/folder/file.ext` references selected from the local media manager.
+- After adding admin field components, regenerate both Payload types and the admin import map.
 - Project and Post `content` is GitHub-flavored Markdown stored as a string, not Payload Lexical JSON.
 - Changing existing CMS records from the old Lexical content shape to Markdown requires manual replacement or a migration.
 - Public project, testimonial, and post fetching should use only `status=published`.

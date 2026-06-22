@@ -3,7 +3,7 @@ services:
     build:
       context: .
       target: dev
-    command: pnpm dev --hostname 0.0.0.0
+    command: pnpm dev
     depends_on:
       db:
         condition: service_healthy

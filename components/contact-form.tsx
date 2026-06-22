@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion"
 
 import { submitContactForm, type ContactActionState } from "@/lib/actions/contact"
 import { Button } from "@/components/ui/button"
+import type { ContactSettings } from "@/lib/data/site-settings-seed"
 
 const initialState: ContactActionState = {
   ok: false,
@@ -34,7 +35,11 @@ const fieldErrorMotion = {
   transition: { duration: 0.16 },
 }
 
-export function ContactForm() {
+type ContactFormProps = {
+  contact: ContactSettings
+}
+
+export function ContactForm({ contact }: ContactFormProps) {
   const formRef = useRef<HTMLFormElement>(null)
   const [values, setValues] = useState(initialValues)
   const [focusedField, setFocusedField] = useState<FieldName | null>(null)
@@ -99,14 +104,13 @@ export function ContactForm() {
         <div className="grid gap-12 border-t border-border pt-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
           <div className="max-w-xl">
             <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              CONTACT
+              {contact.eyebrow}
             </p>
             <h2 className="text-4xl font-bold uppercase leading-none md:text-6xl">
-              Let&apos;s make something useful.
+              {contact.title}
             </h2>
             <p className="mt-6 border-l border-border pl-5 leading-8 text-muted-foreground">
-              Tell me what you are building, what feels stuck, or where you need
-              another pair of hands. I&apos;ll get back to you as soon as I can.
+              {contact.description}
             </p>
           </div>
 
@@ -281,7 +285,7 @@ export function ContactForm() {
                   </>
                 ) : (
                   <>
-                    Send message
+                    {contact.submitLabel}
                     <Send className="h-4 w-4" />
                   </>
                 )}

@@ -4,10 +4,7 @@ These are deferred or likely future stages. Do not implement them unless the cur
 
 ## Cleanup After CMS Content Exists
 
-- Remove temporary frontend fallbacks for Projects after real local/dev and production Payload content is reliable.
-- Remove temporary frontend fallbacks for Testimonials after real local/dev and production Payload content is reliable.
-- Remove temporary frontend fallbacks for Posts after real local/dev and production Payload content is reliable.
-- Remove temporary SiteSettings fallback paths after Hero, About, CTA, Footer, and Header content is seeded and reliable.
+- Remove Payload-unavailable emergency fallbacks for Projects, Testimonials, Posts, Experience Items, Tech Stack Items, and SiteSettings once deployment/runtime reliability makes hard fallback unnecessary.
 
 ## Media
 

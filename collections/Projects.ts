@@ -75,7 +75,11 @@ export const Projects: CollectionConfig = {
               name: "imageUrl",
               type: "text",
               admin: {
-                description: "Public image URL for the project card and project hero image.",
+                components: {
+                  Field: "@/components/admin/local-media-field#default",
+                },
+                description:
+                  "Public image URL for the project card and project hero image. Use local: to choose from the local media library.",
               },
               required: true,
             },

@@ -21,7 +21,7 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["pnpm", "dev", "--hostname", "0.0.0.0"]
+CMD ["pnpm", "dev"]
 
 FROM deps AS builder
 

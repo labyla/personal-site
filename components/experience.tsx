@@ -7,29 +7,8 @@ import {
   useTransform,
 } from "framer-motion"
 
-const experienceItems = [
-  {
-    company: "Independent",
-    role: "Full Stack Developer",
-    period: "2024 - Present",
-    description:
-      "Building CMS-backed websites, product interfaces, and fast frontend systems for small teams and founders.",
-  },
-  {
-    company: "Product Teams",
-    role: "Frontend Engineer",
-    period: "2022 - 2024",
-    description:
-      "Shipped responsive interfaces, polished interaction patterns, and production-ready React experiences.",
-  },
-  {
-    company: "Client Builds",
-    role: "Web Developer",
-    period: "2020 - 2022",
-    description:
-      "Turned early ideas into usable websites with clear structure, practical tooling, and maintainable UI.",
-  },
-]
+import type { ExperienceListItem } from "@/lib/data/experience"
+import type { ExperienceSettings } from "@/lib/data/site-settings-seed"
 
 function ExperienceItem({
   company,
@@ -37,7 +16,7 @@ function ExperienceItem({
   period,
   description,
   index,
-}: (typeof experienceItems)[number] & { index: number }) {
+}: ExperienceListItem & { index: number }) {
   const itemRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: itemRef,
@@ -74,7 +53,12 @@ function ExperienceItem({
   )
 }
 
-export function Experience() {
+type ExperienceProps = {
+  items: ExperienceListItem[]
+  section: ExperienceSettings
+}
+
+export function Experience({ items, section }: ExperienceProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -90,16 +74,16 @@ export function Experience() {
           className="lg:sticky lg:top-32 lg:self-start"
         >
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            MY EXPERIENCE
+            {section.eyebrow}
           </p>
           <h2 className="mt-4 max-w-xs text-4xl font-bold uppercase leading-none md:text-5xl">
-            Scroll through the build record.
+            {section.title}
           </h2>
         </motion.div>
 
         <div>
-          {experienceItems.map((item, index) => (
-            <ExperienceItem key={item.role} {...item} index={index} />
+          {items.map((item, index) => (
+            <ExperienceItem key={item.id} {...item} index={index} />
           ))}
         </div>
       </div>

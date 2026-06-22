@@ -26,7 +26,7 @@ export function Hero({ hero }: HeroProps) {
           >
             <span className="inline-flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-accent" />
-              Available for selected builds
+              {hero.availabilityLabel}
             </span>
             <span className="hidden h-px w-10 bg-border sm:block" />
             <a
@@ -80,7 +80,7 @@ export function Hero({ hero }: HeroProps) {
               >
                 <a href={hero.secondaryCtaHref}>
                   <Mail className="mr-1 h-4 w-4" />
-                  Email
+                  {hero.secondaryCtaLabel}
                 </a>
               </Button>
             </div>
@@ -94,11 +94,10 @@ export function Hero({ hero }: HeroProps) {
           className="hidden border-l border-border pl-6 text-sm text-muted-foreground lg:block"
         >
           <p className="mb-4 text-xs uppercase tracking-wider text-muted-foreground">
-            Focus
+            {hero.focusLabel}
           </p>
           <p className="leading-7">
-            Frontend systems, product interfaces, motion-light interaction, and
-            CMS-backed sites that stay clean after launch.
+            {hero.focusText}
           </p>
         </motion.div>
       </div>

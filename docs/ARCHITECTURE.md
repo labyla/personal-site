@@ -21,10 +21,11 @@
 - `components/ui/`: shadcn-style primitives.
 - `components/rich-text.tsx`: shared GitHub-like Markdown renderer for projects and posts.
 - `components/admin/github-markdown-field.tsx`: Payload Admin Markdown editor with Edit/Preview modes and a slash helper.
-- `collections/`: Payload collections such as `Users`, `Projects`, `Testimonials`, `Posts`, and `ContactSubmissions`.
+- `collections/`: Payload collections such as `Users`, `Media`, `Projects`, `Testimonials`, `Posts`, `ExperienceItems`, `TechStackItems`, and `ContactSubmissions`.
 - `globals/`: Payload globals such as `SiteSettings`.
 - `lib/data/`: server-side public data loaders and seed/fallback source data.
 - `lib/actions/`: server actions, including contact submission handling.
+- `lib/media.ts`: string helpers for resolving local media references such as `local:/folder/file.png`.
 - `lib/payload/access.ts`: access-control and permission helpers.
 - `scripts/`: Payload bin seed scripts.
 - `public/`: static assets.
@@ -43,8 +44,11 @@ The current public CMS data flow is:
 - Payload collection/global stores editable content.
 - `lib/data/*` reads published/public data through Payload Local API.
 - Loaders normalize data into the shape expected by existing components.
+- Local media strings use the `local:` prefix in editable URL fields and Markdown, then resolve to `/local-media/...` on the public site.
 - Routes render server-side and pass data to client components where needed.
-- Temporary fallbacks keep public pages populated while local/dev/production CMS content is being seeded.
+- `pnpm cms:bootstrap` applies Payload migrations and then seeds starter Projects, Posts, Testimonials, Experience Items, Tech Stack Items, and SiteSettings values into PostgreSQL.
+- `pnpm dev` runs `cms:bootstrap` before `next dev`, so Docker Compose local startup prepares a fresh database before the public site depends on it.
+- Payload `onInit` also runs the idempotent initial-content bootstrap for Next runtime initialization after the schema exists.
 
 ## Caching
 
@@ -59,6 +63,8 @@ Expected local app environment variables:
 - `DATABASE_URL=postgres://personal_site:personal_site@db:5432/personal_site`
 - `PAYLOAD_SECRET=local-payload-secret-change-me`
 
+`PAYLOAD_DB_PUSH=true` is available as an explicit local override for Payload schema push, but the default workflow is migrations through `cms:bootstrap`.
+
 ## Verification
 
 For most changes, verify with:
@@ -71,3 +77,4 @@ For visual changes, also run `docker compose up --build` and inspect affected pa
 For Payload collection/global changes, run:
 
 - `docker compose run --rm app pnpm payload generate:types`
+- `docker compose run --rm app pnpm payload generate:importmap` when adding or changing custom admin components.

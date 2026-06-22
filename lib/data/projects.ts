@@ -1,6 +1,8 @@
 import config from "@payload-config"
 import { getPayload } from "payload"
 
+import { resolveMediaUrl } from "@/lib/media"
+
 import { projectSeedItems } from "./project-seed"
 
 export type ProjectListItem = {
@@ -43,7 +45,7 @@ const fallbackProjects: ProjectListItem[] = projectSeedItems.map((project, index
   slug: project.slug,
   title: project.title,
   description: project.description,
-  image: project.imageUrl,
+    image: resolveMediaUrl(project.imageUrl),
   tags: project.tags,
   gradient: projectGradients[index % projectGradients.length],
   href: `/projects/${project.slug}`,
@@ -80,7 +82,7 @@ function mapProject(project: PayloadProject, index: number): ProjectListItem {
     slug: project.slug || "",
     title: project.title || "",
     description: project.description || "",
-    image: project.imageUrl || "",
+    image: resolveMediaUrl(project.imageUrl),
     tags,
     gradient: projectGradients[index % projectGradients.length],
     href: project.slug ? `/projects/${project.slug}` : project.href || "#",
@@ -99,7 +101,7 @@ function mapProjectDetail(project: PayloadProject): ProjectDetail {
     description: project.description || "",
     excerpt: project.excerpt || project.description || "",
     content: project.content || null,
-    imageUrl: project.imageUrl || "",
+    imageUrl: resolveMediaUrl(project.imageUrl),
     tags,
     publishedAt: project.publishedAt || null,
     metaTitle: project.metaTitle || project.title || "",
@@ -143,10 +145,6 @@ export async function getProjects(): Promise<ProjectListItem[]> {
         },
       },
     })
-
-    if (result.docs.length === 0) {
-      return fallbackProjects
-    }
 
     return sortProjects(result.docs as PayloadProject[]).map(mapProject)
   } catch (error) {

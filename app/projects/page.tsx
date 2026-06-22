@@ -6,14 +6,15 @@ import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
 import { PublicSiteShell } from "@/components/public-site-shell"
 import { getProjects } from "@/lib/data/projects"
-import { getFooter, getHeader } from "@/lib/data/site-settings"
+import { getFooter, getHeader, getProjectsPage } from "@/lib/data/site-settings"
 
 export const revalidate = 60
 
 export default async function ProjectsPage() {
-  const [header, footer, projects] = await Promise.all([
+  const [header, footer, page, projects] = await Promise.all([
     getHeader(),
     getFooter(),
+    getProjectsPage(),
     getProjects(),
   ])
 
@@ -24,22 +25,22 @@ export default async function ProjectsPage() {
       <section className="px-4 pb-20 pt-32 md:pb-28">
         <div className="mx-auto max-w-6xl">
           <Link
-            href="/#work"
+            href={page.backHref}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back home
+            {page.backLabel}
           </Link>
 
           <div className="mb-14 mt-10 border-t border-border pt-8">
             <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              PROJECTS
+              {page.eyebrow}
             </p>
             <h1 className="max-w-4xl text-[clamp(3.25rem,9vw,8rem)] font-bold uppercase leading-[0.88] tracking-normal">
-              All projects
+              {page.title}
             </h1>
             <p className="mt-8 max-w-2xl border-l border-border pl-5 leading-8 text-muted-foreground">
-              A closer look at selected product, engineering, and interface work.
+              {page.description}
             </p>
           </div>
 
@@ -96,10 +97,10 @@ export default async function ProjectsPage() {
           </div>
 
           <Link
-            href="/#work"
+            href={page.footerCtaHref}
             className="mt-10 inline-flex items-center gap-2 border border-border bg-secondary px-5 py-3 text-sm transition-colors hover:border-accent/40 hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            Back to selected work
+            {page.footerCtaLabel}
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>

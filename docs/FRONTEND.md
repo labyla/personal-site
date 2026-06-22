@@ -56,7 +56,23 @@ Do not add `brandName`, external/new-tab link behavior, or header hiding unless 
 
 Hero settings come from `SiteSettings.hero`.
 
-The public site uses a lightweight static atmospheric background and a short intro animation as part of its visual identity. Keep the intro polished and consistent across OS/browser motion settings.
+The public site uses a lightweight static atmospheric background and an intro loading overlay as part of its visual identity. The overlay shows the intro text with a text-width accent progress bar, waits for the mounted page's required content to be ready, then exits so the page appears in its final usable state. Keep the intro polished and consistent across OS/browser motion settings.
+
+## Homepage Section Settings
+
+Homepage singleton copy comes from `SiteSettings` groups rather than hard-coded component constants:
+
+- `bento`
+- `experience`
+- `homeProjects`
+- `homeBlog`
+- `testimonialsSection`
+- `techStack`
+- `contact`
+
+Repeated content still comes from collections where applicable: Projects, Posts, Testimonials, and Tech Stack Items.
+
+The bento stack card uses `SiteSettings.bento.stackHref` and links to the Tech Stack section by default.
 
 ## About
 
@@ -76,7 +92,9 @@ No location or stats fields are included because the current UI does not display
 
 ## Projects
 
-The home page Projects section receives server-loaded Payload data through props. Project cards link to the internal `/projects/[slug]` detail route when a slug is available.
+The home page Projects section receives its heading/link copy from `SiteSettings.homeProjects` and server-loaded Payload data through props. Project cards link to the internal `/projects/[slug]` detail route when a slug is available.
+
+The `/projects` archive intro/back/footer CTA copy comes from `SiteSettings.projectsPage`.
 
 Current public card fields include:
 
@@ -96,11 +114,15 @@ Selected-project hover/focus preview is part of the current UI behavior and shou
 
 ## Blog
 
-The home page Blog section receives server-loaded Payload post data through props. Blog cards link to `/blog/[slug]`.
+The home page Blog section receives its heading/link copy from `SiteSettings.homeBlog` and server-loaded Payload post data through props. Blog cards link to `/blog/[slug]`.
+
+The `/blog` archive intro/back/footer CTA copy comes from `SiteSettings.blogPage`.
 
 Blog cards and article/detail pages should stay aligned with the dark editorial style. Blog Markdown content uses the shared `components/rich-text.tsx` renderer.
 
 ## Testimonials
+
+The Testimonials section heading comes from `SiteSettings.testimonialsSection`; testimonial cards come from the Testimonials collection.
 
 Testimonials should be a full-width horizontal infinite marquee with looped cards and no empty gaps.
 
@@ -123,6 +145,7 @@ Do not base Testimonials movement on `scrollLeft`; use transform-based movement 
 The tech/skills and tools/apps marquee is an interactive infinite marquee immediately after the Hero.
 
 - Skill icons are muted by default.
+- Skill and tool icons are SVG images from either external URLs or local media references.
 - On hover, icons use brand/original color and text becomes white.
 - Default state auto-scrolls. Skills move left, tools/apps move right.
 - Hover/focus slows at the current visual position.
@@ -136,8 +159,10 @@ Use transform-based movement with duplicated groups, like Testimonials. Do not r
 
 The former LAB/Experiments homepage block is now a Tech Stack section linked by `#tools`.
 
+- Section heading/group copy comes from `SiteSettings.techStack`.
 - The section is split into Skills and Tools.
 - Cards should stay compact, sharp, and grid-based.
+- Card icons use the same SVG image behavior as the marquee: white/muted by default, original SVG color on hover.
 - Hover states may reveal the item brand color, border emphasis, and a restrained glow.
 - The large section background glow should fade smoothly inside its own bounds.
   Avoid short gradient boxes that create visible horizontal clipping at the top
@@ -148,7 +173,7 @@ The former LAB/Experiments homepage block is now a Tech Stack section linked by 
 
 The contact form visual system is dark minimal/slightly brutalist with underlined fields.
 
-The form lives in `components/contact-form.tsx`, uses `useActionState`, and connects to `submitContactForm` in `lib/actions/contact.ts`.
+The form lives in `components/contact-form.tsx`, receives heading/button copy from `SiteSettings.contact`, uses `useActionState`, and connects to `submitContactForm` in `lib/actions/contact.ts`.
 
 Fields:
 

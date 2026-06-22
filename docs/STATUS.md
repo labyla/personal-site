@@ -12,7 +12,10 @@ This status reflects the currently accepted project context. Before major change
 - Users with explicit content and feedback permissions.
 - Projects collection, seed script, home page connection, archive page, and detail pages.
 - Testimonials collection, seed script, and home page connection.
-- SiteSettings Global groups for Hero, About, CTA, Footer, and Header.
+- Experience Items collection, seed script, and home page timeline connection.
+- Tech Stack Items collection, seed script, and home page marquee/stack section connection.
+- SiteSettings Global groups for Header, Hero, Bento, Experience heading, homepage Projects/Blog headings, About, Testimonials heading, Tech Stack heading, CTA, Contact, Footer, and Projects/Blog archive pages.
+- Payload Admin Edit/Preview tabs for SiteSettings-backed homepage, projects archive, and blog archive content.
 - Site settings seed script with fill-missing behavior.
 - Posts collection, seed script, home page Blog connection, archive page, and detail pages.
 - Shared GitHub-like Markdown renderer for Projects and Posts.
@@ -24,29 +27,30 @@ This status reflects the currently accepted project context. Before major change
 - Header scroll-linked accent fill that reaches full progress at the Contact section.
 - Header hash navigation routes shared header links from non-home pages back to home sections.
 - Tech Stack section glow polish that avoids clipped top/bottom gradient edges.
+- Local media manager backed by a single Payload `Media` collection.
+- `local:` media references in Project/Post/Testimonial/SiteSettings image URL fields.
+- `local:` media picker inside the Project/Post Markdown editor.
+- Public `/local-media/...` route for resolving local media references.
 
 ## In Progress / Current Direction
 
-- The project is mid-CMS rollout: many public sections are now Payload-backed, but temporary seed/fallback scaffolding remains.
+- The project is mid-CMS rollout: many public sections are now Payload-backed, with automatic initial-content bootstrap for fresh databases.
 - Payload Admin is the current dashboard. A custom user account/dashboard area is not implemented.
 - Content editing should continue slice-by-slice rather than through broad dashboard rewrites.
 
 ## Current Source Of Truth
 
-- Payload is the source of truth for Projects, Testimonials, Posts, and SiteSettings-backed homepage/site content.
-- `lib/data/*-seed.ts` files provide seed data and temporary fallback data during rollout.
+- Payload is the source of truth for Projects, Testimonials, Posts, Experience Items, Tech Stack Items, and SiteSettings-backed homepage/site content.
+- `lib/data/*-seed.ts` files provide bootstrap source data and emergency fallback data during rollout.
 - Contact submissions are stored in Payload and viewed through the standard Payload Admin Panel.
 
 ## Temporary Fallbacks Still Present
 
-- Project fallback data remains in the public loader path until real CMS records are consistently seeded and production content exists.
-- Testimonial fallback data remains for the same reason.
-- Post fallback data remains for the same reason.
-- SiteSettings fallback data remains for Hero, About, CTA, Footer, and Header until seeded/production content is reliable.
+- Project, Testimonial, Post, Experience Item, and Tech Stack Item fallback data remains only for Payload-unavailable error paths; empty backend collections render empty public lists.
+- SiteSettings fallback data remains for Payload-unavailable error paths and normalization safety, but fresh databases are filled by automatic bootstrap.
 
 ## Known Incomplete Areas
 
-- Media uploads are deferred; image fields remain strings such as `imageUrl`, `avatarUrl`, and `coverImageUrl`.
 - Custom user account/dashboard is deferred.
 - Full permission management UI is deferred.
 - Contact submissions are viewed in Payload Admin only; no custom feedback dashboard exists.
@@ -62,4 +66,4 @@ This status reflects the currently accepted project context. Before major change
 - Seed real local/dev content and confirm Payload-backed public pages are populated without relying on fallbacks.
 - Remove temporary fallbacks once production/local CMS content is reliable.
 - Continue any new CMS-backed content area as a small vertical slice.
-- Consider media uploads, permission UI, custom dashboard, notifications, captcha, and logs only when explicitly approved.
+- Consider permission UI, custom dashboard, notifications, captcha, and logs only when explicitly approved.

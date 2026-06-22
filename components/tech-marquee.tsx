@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react"
 import type { CSSProperties, FocusEvent, PointerEvent } from "react"
 
-import { skillItems, toolItems, type TechStackItem } from "@/components/tech-stack-data"
+import type { TechStackItem } from "@/components/tech-stack-data"
 
 const marqueeGroupCount = 6
 const baseSpeed = 0.035
@@ -18,14 +18,18 @@ type MarqueeRowProps = {
 }
 
 function MarqueeChip({ item }: { item: TechStackItem }) {
-  const Icon = item.icon
-
   return (
     <div
       className="group flex items-center gap-2 whitespace-nowrap border border-border bg-secondary/40 px-3 py-2 transition-colors hover:border-accent/35 hover:bg-secondary/70"
       style={{ "--skill-color": item.color } as CSSProperties}
     >
-      <Icon className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-[var(--skill-color)]" />
+      {item.icon && (
+        <img
+          alt=""
+          className="h-4 w-4 object-contain opacity-65 brightness-0 invert transition duration-300 group-hover:opacity-100 group-hover:brightness-100 group-hover:invert-0"
+          src={item.icon}
+        />
+      )}
       <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground transition-colors group-hover:text-foreground">
         {item.name}
       </span>
@@ -243,19 +247,24 @@ function MarqueeRow({ ariaLabel, direction, items, rowClassName }: MarqueeRowPro
   )
 }
 
-export function TechMarquee() {
+type TechMarqueeProps = {
+  skills: TechStackItem[]
+  tools: TechStackItem[]
+}
+
+export function TechMarquee({ skills, tools }: TechMarqueeProps) {
   return (
     <div className="border-y border-border bg-background/60">
       <MarqueeRow
         ariaLabel="Scrollable skills list"
         direction={-1}
-        items={skillItems}
+        items={skills}
         rowClassName="border-b border-border/70"
       />
       <MarqueeRow
         ariaLabel="Scrollable tools and apps list"
         direction={1}
-        items={toolItems}
+        items={tools}
       />
     </div>
   )

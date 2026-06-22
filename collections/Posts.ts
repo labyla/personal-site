@@ -66,7 +66,11 @@ export const Posts: CollectionConfig = {
               name: "coverImageUrl",
               type: "text",
               admin: {
-                description: "Public image URL for the blog card and article hero image.",
+                components: {
+                  Field: "@/components/admin/local-media-field#default",
+                },
+                description:
+                  "Public image URL for the blog card and article hero image. Use local: to choose from the local media library.",
               },
               required: true,
             },

@@ -6,6 +6,8 @@ import { FieldDescription, FieldError, FieldLabel, useField } from "@payloadcms/
 
 import { RichText } from "@/components/rich-text"
 
+import LocalMediaPicker from "./local-media-picker"
+
 type MarkdownCommand = {
   label: string
   hint: string
@@ -33,6 +35,11 @@ type GitHubMarkdownFieldProps = {
 type SlashState = {
   end: number
   query: string
+  start: number
+}
+
+type LocalMediaState = {
+  end: number
   start: number
 }
 
@@ -92,6 +99,12 @@ const commands: MarkdownCommand[] = [
     template: "![Alt text](https://example.com/image.png)\n\n",
   },
   {
+    label: "Local media",
+    hint: "local:/path/file",
+    keywords: ["image", "video", "file", "asset"],
+    template: "local:",
+  },
+  {
     label: "Note alert",
     hint: "> [!NOTE]",
     keywords: ["callout", "alert"],
@@ -143,6 +156,21 @@ function slashStatesMatch(a: SlashState | null, b: SlashState | null) {
   return a?.start === b?.start && a?.end === b?.end && a?.query === b?.query
 }
 
+function getLocalMediaState(textarea: HTMLTextAreaElement): LocalMediaState | null {
+  const end = textarea.selectionStart
+  const beforeCaret = textarea.value.slice(0, end)
+  const match = beforeCaret.match(/(^|[\s("'([])(local:[^\s)"'\]]*)$/i)
+
+  if (!match) {
+    return null
+  }
+
+  return {
+    end,
+    start: end - match[2].length,
+  }
+}
+
 export default function GitHubMarkdownField({
   field,
   path,
@@ -152,6 +180,7 @@ export default function GitHubMarkdownField({
   const { errorMessage, setValue, showError, value } = useField<string>({ path })
   const [mode, setMode] = useState<"edit" | "preview">("edit")
   const [slashState, setSlashState] = useState<SlashState | null>(null)
+  const [localMediaState, setLocalMediaState] = useState<LocalMediaState | null>(null)
   const [activeCommandIndex, setActiveCommandIndex] = useState(0)
 
   const markdown = typeof value === "string" ? value : ""
@@ -179,9 +208,22 @@ export default function GitHubMarkdownField({
     })
   }
 
+  function updateLocalMediaState() {
+    const textarea = textareaRef.current
+
+    if (!textarea) {
+      return
+    }
+
+    setLocalMediaState(getLocalMediaState(textarea))
+  }
+
   function handleChange(nextValue: string) {
     setValue(nextValue)
-    requestAnimationFrame(updateSlashState)
+    requestAnimationFrame(() => {
+      updateSlashState()
+      updateLocalMediaState()
+    })
   }
 
   function insertCommand(command: MarkdownCommand) {
@@ -197,6 +239,27 @@ export default function GitHubMarkdownField({
 
     setValue(nextValue)
     setSlashState(null)
+    textarea.focus()
+    requestAnimationFrame(() => {
+      textarea.setSelectionRange(nextCaretPosition, nextCaretPosition)
+      updateLocalMediaState()
+    })
+  }
+
+  function insertLocalMediaReference(nextReference: string) {
+    const textarea = textareaRef.current
+    const targetState = localMediaState || (textarea ? getLocalMediaState(textarea) : null)
+
+    if (!textarea || !targetState) {
+      return
+    }
+
+    const nextValue =
+      markdown.slice(0, targetState.start) + nextReference + markdown.slice(targetState.end)
+    const nextCaretPosition = targetState.start + nextReference.length
+
+    setValue(nextValue)
+    setLocalMediaState(null)
     textarea.focus()
     requestAnimationFrame(() => {
       textarea.setSelectionRange(nextCaretPosition, nextCaretPosition)
@@ -237,6 +300,7 @@ export default function GitHubMarkdownField({
     }
 
     updateSlashState()
+    updateLocalMediaState()
   }
 
   return (
@@ -298,7 +362,10 @@ export default function GitHubMarkdownField({
             disabled={disabled}
             onBlur={() => setTimeout(() => setSlashState(null), 140)}
             onChange={(event) => handleChange(event.target.value)}
-            onClick={updateSlashState}
+            onClick={() => {
+              updateSlashState()
+              updateLocalMediaState()
+            }}
             onKeyDown={handleKeyDown}
             onKeyUp={handleKeyUp}
             placeholder={field.admin?.placeholder || "Paste a README.md or write GitHub Markdown..."}
@@ -317,6 +384,12 @@ export default function GitHubMarkdownField({
               width: "100%",
             }}
             value={markdown}
+          />
+
+          <LocalMediaPicker
+            onClose={() => setLocalMediaState(null)}
+            onSelect={insertLocalMediaReference}
+            open={Boolean(localMediaState)}
           />
 
           {slashState && filteredCommands.length > 0 && (

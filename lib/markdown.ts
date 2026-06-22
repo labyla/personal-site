@@ -1,5 +1,7 @@
 import { marked } from "marked"
 
+import { resolveMediaUrl } from "@/lib/media"
+
 type Footnote = {
   id: string
   index: number
@@ -40,18 +42,19 @@ function escapeAttribute(value: string) {
 
 function isSafeUrl(value: string) {
   const trimmed = value.trim()
+  const resolved = resolveMediaUrl(trimmed)
 
   if (
-    trimmed.startsWith("#") ||
-    trimmed.startsWith("/") ||
-    trimmed.startsWith("./") ||
-    trimmed.startsWith("../")
+    resolved.startsWith("#") ||
+    resolved.startsWith("/") ||
+    resolved.startsWith("./") ||
+    resolved.startsWith("../")
   ) {
     return true
   }
 
   try {
-    const url = new URL(trimmed)
+    const url = new URL(resolved)
 
     return ["http:", "https:", "mailto:"].includes(url.protocol)
   } catch {
@@ -124,24 +127,27 @@ renderer.heading = function ({ tokens, depth }) {
 
 renderer.link = function ({ href, title, tokens }) {
   const text = this.parser.parseInline(tokens)
+  const resolvedHref = resolveMediaUrl(href)
 
-  if (!isSafeUrl(href)) {
+  if (!isSafeUrl(resolvedHref)) {
     return text
   }
 
   const titleAttr = title ? ` title="${escapeAttribute(title)}"` : ""
 
-  return `<a href="${escapeAttribute(href)}"${titleAttr}>${text}</a>`
+  return `<a href="${escapeAttribute(resolvedHref)}"${titleAttr}>${text}</a>`
 }
 
 renderer.image = ({ href, title, text }) => {
-  if (!isSafeUrl(href)) {
+  const resolvedHref = resolveMediaUrl(href)
+
+  if (!isSafeUrl(resolvedHref)) {
     return escapeHtml(text)
   }
 
   const titleAttr = title ? ` title="${escapeAttribute(title)}"` : ""
 
-  return `<img src="${escapeAttribute(href)}" alt="${escapeAttribute(text)}"${titleAttr}>`
+  return `<img src="${escapeAttribute(resolvedHref)}" alt="${escapeAttribute(text)}"${titleAttr}>`
 }
 
 renderer.blockquote = function ({ tokens }) {

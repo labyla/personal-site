@@ -160,6 +160,14 @@ Why: Most project material already exists as GitHub README.md files, and copying
 
 Consequences: The Payload Admin content editor uses a custom Markdown field with Edit/Preview modes and a slash helper. Public project and blog detail pages render Markdown through `components/rich-text.tsx`. Existing Lexical JSON content needs manual replacement or a migration before it will render as Markdown.
 
+## Undated — Use String-Based Local Media References
+
+Decision: Add one Payload-backed `Media` collection with folder and file entries, but keep existing public media fields as strings that can contain either external URLs or `local:/folder/file.ext` references.
+
+Why: Existing Projects, Posts, Testimonials, and SiteSettings already use URL strings. A string prefix gives the owner local media independence without forcing a broad relationship-field migration.
+
+Consequences: Uploading files and creating folders happen only in the `Media` collection's custom file-manager list view. That view exposes `Upload File` and `Create Folder` actions in the currently open folder and shows only immediate children. Admin URL fields use a custom local media picker when `local:` is typed, but that picker only selects existing media. Project/Post Markdown supports the same prefix. Public loaders and Markdown rendering resolve `local:` to `/local-media/...`, where a Next route finds the upload by `path`.
+
 ## PR 11 — Add Project Detail Pages
 
 Decision: Use `/projects/[slug]` as the canonical internal route for project materials.
@@ -271,3 +279,27 @@ Decision: Header hash links stored as `#section` values are treated as global ho
 Why: The Header is shared across archive and detail pages, but sections such as `#about`, `#work`, `#blog`, and `#contact` live on the home page only.
 
 Consequences: From non-home pages, Header section links should navigate to the home page with the hash. From the home page, clicking a section link should manually scroll to that section even if the URL already contains the same hash.
+
+## Undated — SiteSettings Page Content Groups
+
+Decision: Store singleton homepage section copy and archive-page intro/CTA copy in explicit `SiteSettings` groups instead of introducing a block/page-builder model.
+
+Why: The current site has fixed, designed sections. Named groups keep Payload editing clear, preserve public component contracts, and avoid speculative page-builder complexity.
+
+Consequences: Continue adding singleton page controls as small named groups with field descriptions and page-specific preview tabs. Repeated content stays in collections.
+
+## Undated — Automatic Initial CMS Content Bootstrap
+
+Decision: Run an idempotent initial-content bootstrap from Payload `onInit`.
+
+Why: Fresh databases should immediately store starter Projects, Posts, Testimonials, Experience Items, Tech Stack Items, and SiteSettings values in PostgreSQL so the public site reads real backend content instead of relying on hardcoded frontend fallbacks.
+
+Consequences: `lib/payload/bootstrap-content.ts` is the shared source for automatic bootstrap and manual seed commands. The bootstrap creates collection records only when their `slug` is missing and fills missing SiteSettings values without overwriting existing admin edits. Set `PAYLOAD_BOOTSTRAP_CONTENT=false` only when intentionally disabling this behavior.
+
+## Undated — Repeated Experience And Stack Content Use Collections
+
+Decision: Store experience timeline entries and individual skill/tool stack items in Payload collections instead of `SiteSettings` arrays or frontend constants.
+
+Why: Experience entries, skills, and tools are repeated public content that should be managed like Projects, Posts, and Testimonials. SiteSettings should only own singleton section copy such as headings and descriptions.
+
+Consequences: `ExperienceItems` and `TechStackItems` have their own admin list pages, field descriptions, preview tabs, seed commands, bootstrap records, and public loaders. Empty backend collections render empty lists; static seed data is only an unavailable-Payload fallback.
