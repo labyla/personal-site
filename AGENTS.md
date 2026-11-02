@@ -1,6 +1,6 @@
 # Agent instructions
 
-This repository is a language-neutral project starter. These instructions apply to any coding agent and to the project created from this starter.
+This repository is a Next.js App Router personal site written in TypeScript. The active flow is a full-cycle liquid-glass loader, followed by illuminated fluted-panel assembly with the text retained, a shared text/light fade, and cyan hover light. The earlier pink/purple Prisma background is preserved but disabled. Audio has been removed. Use Docker for dependency installation, development, and checks. Use the internal browser for visual verification; do not use Chrome DevTools MCP.
 
 ## Start here
 
@@ -11,7 +11,7 @@ This repository is a language-neutral project starter. These instructions apply 
 
 ## Project decisions
 
-- Treat `{{...}}` markers as unfilled template fields, not as project requirements.
+- Treat double-brace template markers as unfilled template fields, not as project requirements.
 - Use the user's project description and repository evidence to fill fields that are directly determined.
 - Ask the user whenever a material project decision is unclear. This includes product behavior, stack, architecture, data handling, security expectations, deployment, and tradeoffs. Do not silently invent a decision to make progress.
 - Record confirmed decisions in `docs/DECISIONS.md` and update the related project document.
@@ -28,12 +28,13 @@ This repository is a language-neutral project starter. These instructions apply 
 
 ## Project commands
 
-During initialization, replace this section with the selected project's actual setup, run, and verification commands. Until then, do not guess them.
+Run from the repository root using Docker Desktop.
 
-- Setup: `{{SETUP_COMMAND}}`
-- Run: `{{RUN_COMMAND}}`
-- Focused checks: `{{FOCUSED_CHECK_COMMAND}}`
-- Full verification: `{{FULL_VERIFICATION_COMMAND}}`
+- Setup: `docker compose run --rm app npm ci`
+- Run: `docker compose up --build`; open `http://localhost:3000`.
+- Focused checks: `docker compose run --rm app npm test` and `docker compose run --rm app npm run typecheck`
+- Full verification: `docker compose run --rm app npm run build`, then inspect the active intro animation and responsive composition in the internal browser at desktop and mobile sizes.
+- Harness checks: `docker compose --profile checks run --rm harness python scripts/harness_check.py validate-template` and `docker compose --profile checks run --rm harness python scripts/harness_check.py check-handoff`.
 
 ## Session handoff
 

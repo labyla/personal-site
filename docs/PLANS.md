@@ -1,11 +1,13 @@
 # Plans
 
-Use this file to link active work plans when a goal spans multiple features or sessions. Keep individual plans focused and move completed plans to `plans/completed/` if that directory is introduced.
+## Active plan
 
-## Active plans
+F-004: illuminated panel assembly with retained text and shared light/text fade.
 
-{{ACTIVE_PLAN_LINKS_OR_NONE}}
+## Sequencing
 
-## Dependencies and sequencing
-
-{{DEPENDENCIES_AND_SEQUENCE}}
+1. Wait for resources and complete the loader cycle.
+2. Keep the glyph-only overlay while fully illuminated panels arrive.
+3. Fade all-panel illumination and text together over 1.2 seconds.
+4. Dispose the text overlay and enable ordinary pointer glow.
+5. Owner reviews this transition before page content work.

@@ -1,4 +1,130 @@
 {
-  "project_status": "needs_initialization",
-  "features": []
+  "project_status": "loading_transition_preview",
+  "features": [
+    {
+      "id": "F-001",
+      "priority": 1,
+      "area": "background",
+      "title": "Full-page interactive Prisma background",
+      "user_visible_behavior": "Light-pink diagonal fluted glass fills the screen; pointer movement produces purple fluid trails refracted through rainbow-edged glass.",
+      "acceptance_criteria": [
+        "Only the background is visible; no text, navigation, or controls.",
+        "Keep the Swirl, ChromaFlow, FlutedGlass, and FilmGrain motion/glass parameters from Prisma, using the owner-requested pink/purple palette.",
+        "Pointer movement produces a visible purple flow through light-pink glass.",
+        "The background covers desktop and mobile viewports without scrollbars.",
+        "Docker TypeScript, production build, and harness document checks pass."
+      ],
+      "verification": [
+        "docker compose run --rm app npm run typecheck",
+        "docker compose run --rm app npm run build",
+        "docker compose --profile checks run --rm harness python scripts/harness_check.py validate-template",
+        "docker compose --profile checks run --rm harness python scripts/harness_check.py check-handoff",
+        "Internal-browser desktop/mobile layout and pointer inspection"
+      ],
+      "status": "passing",
+      "evidence": [
+        "Docker TypeScript and production build passed after npm ci in the Node 24 image.",
+        "HTTP localhost:3000 returned 200 OK.",
+        "Internal browser: desktop 1280x720 viewport, page, and canvas dimensions matched; no visible text.",
+        "Production preview: orange flow visible after mouse movement without pressed buttons; screenshot saved at /private/tmp/personal-site-prisma-background.jpg.",
+        "Internal browser: viewport, page, and canvas dimensions matched at 390x844; full coverage confirmed after renderer resize.",
+        "Docker validate-template and check-handoff passed.",
+        "After restoring development service, pointer motion without pressed buttons again produced a strong orange flow; local page remained background-only.",
+        "Pink/purple palette update: Docker typecheck and production build passed; internal browser confirmed pink resting glass and purple flow after pointer motion. Screenshot: /private/tmp/personal-site-pink-purple.jpg. Earlier orange-flow evidence records the original baseline."
+      ],
+      "notes": "Native touch and physical-device performance are unverified; internal browser does not support Input.dispatchTouchEvent. Two external-omitted warnings from the shaders/typegpu dependency were captured in development; no browser errors captured. Temporarily disabled by owner request while F-002 is refined; components and palette are preserved. Historical passing evidence applies to the earlier mounted background."
+    },
+    {
+      "id": "F-002",
+      "priority": 2,
+      "area": "intro",
+      "title": "Rounded glass loading animation",
+      "user_visible_behavior": "Silent rounded liquid-glass labyla loader over six cyan/deep-teal lines; plays complete cycles until resources are ready, then exits after all lines leave.",
+      "acceptance_criteria": [
+        "Apply the inspected Bencho dark preset optical equations to glyph contours: 1.1x magnification, bend 1, fringe 0.4, 41.4px bevel, inner rim lighting and soft shadow.",
+        "Keep the original pink/purple interactive background intact but unmounted.",
+        "Fit desktop/mobile screens without cropping the wordmark or adding scrollbars.",
+        "Pass Docker TypeScript/build and harness checks; inspect visual fidelity against the reference.",
+        "Individual lines brake to rest near the centre at staggered times, hold, and accelerate away with a mirrored velocity curve.",
+        "Six stripes move from bottom-left to top-right, have softly blurred lateral edges on both sides, and leave the viewport before resetting without an interior fade mask.",
+        "Every stripe has the same crisp middle and blurred ends along its length, independent of its perpendicular offset.",
+        "Resting stripe spacing is tighter (0.95 units); the speed curve has a steeper parabolic rise with a gentle zero-speed start.",
+        "Use a horizontal baseline at 640 px and above; stack the six upright letters below 640 px, without clipping or overflow.",
+        "Restore six stripes, 0.95 pitch, 0.475 width and 0.035-cycle stagger; retain motion stages, direction and focus.",
+        "Background lines fade from bright cyan to deep blue-green like the latest attached reference; glyph outer corners and inner joins are rounded.",
+        "Refraction remains continuous across thin stroke centres; contour and refracted-line edges are antialiased at desktop/mobile sizes.",
+        "Use silent full-cycle loading behavior; no sound controls or audio synthesis remain."
+      ],
+      "verification": [
+        "docker compose run --rm app npm test",
+        "docker compose run --rm app npm run typecheck",
+        "docker compose run --rm app npm run build",
+        "Internal-browser composition, animation, and 390x844 resize inspection",
+        "Docker validate-template and check-handoff"
+      ],
+      "status": "passing",
+      "evidence": [
+        "Baseline and updated Docker TypeScript checks passed.",
+        "Docker production build passed.",
+        "Internal browser: one canvas, no video elements or visible text, viewport/page 1280x720.",
+        "Successive desktop screenshots differed, confirming active animation.",
+        "Internal browser: viewport, page, and canvas 390x844; X fully visible without overflow.",
+        "No captured browser errors or warnings for the intro.",
+        "Docker validate-template and check-handoff passed. Screenshot: /private/tmp/personal-site-glass-x-intro.jpg.",
+        "2026-11-02: three motion tests passed for deceleration/hold/mirrored acceleration, staggered stops/departures, and off-screen loop reset. Docker TypeScript/build passed.",
+        "2026-11-02 refinement: baseline/updated npm test and typecheck passed; production build passed. Tests cover six stripes, increasing travel coordinates, mirrored acceleration and off-screen reset. Browser inspection confirmed soft symmetric edges and full-frame stripe rendering without errors.",
+        "2026-11-02 spatial softness: Docker baseline tests/typecheck and updated typecheck/build passed; browser confirmed crisp central edges blending to soft peripheral edges without errors.",
+        "2026-11-02: four Docker motion tests, TypeScript, and production build passed after changing pitch to 0.95 and excursion to 1.8 times the former value; browser confirmed identical along-stripe focus profiles, including outer stripes, without errors.",
+        "Responsive wordmark: final Docker TypeScript and production build passed; all four preserved stripe tests and both harness checks passed. Internal browser verified horizontal at 640 px and 1092x957, vertical at 639 px and 390x844, one canvas and no overflow/errors/warnings. Screenshots: /private/tmp/labyla-liquid-glass-desktop.jpg and /private/tmp/labyla-liquid-glass-mobile.jpg.",
+        "2026-11-02 black concept: Docker baseline npm test (4/4) and typecheck passed. Final docker compose run --rm app npm test (4/4), npm run typecheck, and npm run build passed. Existing Node MODULE_TYPELESS_PACKAGE_JSON warning remains harmless. Internal browser confirmed 1092x957 horizontal, 390x844 upright vertical with one canvas and no overflow, and horizontal at the 640px breakpoint. Local font loads; text remains visible after resize; successive frames show motion and refraction; no captured errors/warnings. Desktop and mobile screenshots: /private/tmp/labyla-black-glass-desktop.jpg and /private/tmp/labyla-black-glass-mobile.jpg.",
+        "2026-11-02 Bencho/Prisma refinement: baseline Docker 4 motion tests and TypeScript passed. Final docker compose run --rm app npm test passed 5/5 (including shared ten-stripe central hold); npm run typecheck and npm run build passed. Internal browser confirmed Arial-style lowercase wordmark, magnification/bevel/fringe, joined glass across the smaller word, and active looping motion at 1386x957. Mobile 390x844 confirmed upright letters, one canvas, viewport-sized host/buffer and no page overflow. No captured errors/warnings. Screenshots: /private/tmp/labyla-bubble-glass-desktop.jpg and /private/tmp/labyla-bubble-glass-mobile.png. Existing Node MODULE_TYPELESS_PACKAGE_JSON warning remains.",
+        "Final Docker validate-template and check-handoff passed; git diff --check passed.",
+        "2026-11-02 glass text over white stripes: baseline Docker tests (5/5) and typecheck passed. Restored four motion tests pass for six lines, mirrored acceleration, stagger and off-screen reset. Docker typecheck/build passed. Internal browser verified glass glyphs in front of white stripes, visible refraction and active motion at 1386x957; vertical 390x844 has one canvas and no page overflow. No captured browser errors/warnings. Screenshots: /private/tmp/labyla-glass-text-desktop.jpg and /private/tmp/labyla-glass-text-mobile.jpg.",
+        "Final mobile bevel scaling: Docker typecheck/build passed; internal browser verified 390x844 vertical glass letters over white stripes.",
+        "2026-11-02 specified Bencho preset: internal browser confirmed controls Size 230, Bend 100, Fringe 40, Corner 0, dark and published shader normalization. Baseline Docker 4 tests/typecheck passed. Updated npm test passes 6/6 (four unchanged motion tests and two glyph-distance tests); typecheck/build passed. Desktop internal browser confirmed spectral transmitted highlights, directional rim, active loop and no errors/warnings; 390x844 confirmed upright letters, one canvas and no page overflow. Screenshots: /private/tmp/labyla-spectral-glass-desktop.jpg and /private/tmp/labyla-spectral-glass-mobile.jpg.",
+        "Final Euclidean-distance version: Docker npm test 6/6, typecheck and build passed. Desktop/mobile screenshots refreshed; no browser errors/warnings.",
+        "2026-11-02 rounded cyan refinement: baseline Docker npm test passed 6/6 and typecheck passed. Final Docker npm run typecheck and npm run build passed. Internal browser confirmed rounded outer corners and inner joins, cyan-to-deep-teal lines, refraction and active motion at desktop size; 390x844 confirmed upright letters, one canvas and no page overflow. No captured errors/warnings. Screenshots: /private/tmp/labyla-rounded-cyan-desktop.jpg and /private/tmp/labyla-rounded-cyan-mobile.jpg.",
+        "2026-11-02 refraction fold/alias fix: baseline Docker npm test (6/6) and typecheck passed. Final Docker npm test (6/6), typecheck and production build passed. Internal browser inspected line crossings through thin stems and curved glyphs: continuous refraction replaces the former abrupt direction flips; contours and sampled line edges are smoother. Reload and 390x844 resize passed with upright letters, one canvas, no overflow or captured errors/warnings. Screenshots: /private/tmp/labyla-smooth-glass-desktop.jpg and /private/tmp/labyla-smooth-glass-mobile.jpg.",
+        "2026-11-02 continuous renderer: baseline and final Docker 12/12 tests, typecheck and build passed. Internal browser verified one canvas throughout loading/assembly/fade/ready, live panel refraction in text, vertical 390x844 layout without overflow and no captured errors/warnings. Internal-CDP trace: 1224 animation callbacks, maximum callback duration 12.711ms; two >50ms frame intervals occurred only in the initial 285ms preparation, none afterward. This is local browser evidence, not a physical-device guarantee. Screenshots: /private/tmp/labyla-continuous-glass.jpg and /private/tmp/labyla-continuous-fade.jpg.",
+        "2026-11-02 persistent flow: baseline 12 tests/typecheck passed; updated 14 tests (including trail persistence, decay and stationary-pointer behavior), typecheck and build passed in Docker. Internal browser at 1386x957 confirmed clean glass text without the external dotted contour, live refracted trails remaining along the pointer path, decay and autonomous flute drift. 390x844 confirmed vertical glass text, one canvas, no overflow and completed transition; no captured errors/warnings. Screenshots: /private/tmp/labyla-clean-glass-panels.jpg, /private/tmp/labyla-prisma-trail.jpg, /private/tmp/labyla-restored-flow-mobile.jpg. Standalone Chrome on the owner device has not been independently checked."
+      ],
+      "notes": "Signed glyph distance controls contours, while a separate Gaussian height field supplies continuous surface normals. This adapts round Bencho optics to thin strokes. Extra 2x texture memory/resize cost and physical-device performance remain unverified. The loading lifecycle now supersedes indefinite preview looping. Historical audio feature F-003 was removed by owner request; its history remains in DECISIONS.md."
+    },
+    {
+      "id": "F-004",
+      "priority": 4,
+      "area": "transition",
+      "title": "Illuminated panel assembly and synchronized text fade",
+      "user_visible_behavior": "Illuminated panel assembly behind glass labyla, synchronized text/light evaporation, then drifting black flutes with advected cyan/deep-teal pointer trails.",
+      "acceptance_criteria": [
+        "Remove all audio functionality and controls.",
+        "Wait for window load, fonts and the background first frame.",
+        "Always finish at least one full cycle; repeat if not ready, then wait for the next full boundary.",
+        "All six delayed lines leave before assembly; no first line respawns in the tail.",
+        "Panels actually translate from upper-left with staggered cubic braking.",
+        "The resting background is black and reveals the loader palette on pointer hover.",
+        "Desktop/mobile complete the sequence without overflow; intro cleanup leaves one canvas.",
+        "Keep text visible above panels throughout their assembly.",
+        "Illuminate every panel during arrival, independent of hover.",
+        "Begin a single synchronized text/light fade only after the last panel lands; both reach zero together.",
+        "Gate local pointer glow until the shared fade ends, then dispose the text overlay.",
+        "Pointer motion leaves advected trails that fade after movement stops; flutes move autonomously without a cursor."
+      ],
+      "verification": [
+        "docker compose run --rm app npm test",
+        "docker compose run --rm app npm run typecheck",
+        "docker compose run --rm app npm run build",
+        "Internal-browser phase, panel motion, hover and responsive checks",
+        "Docker validate-template and check-handoff"
+      ],
+      "status": "passing",
+      "evidence": [
+        "2026-11-02 loading/assembly flow: baseline Docker npm test 11/11 and typecheck passed. Audio modules, source helpers, button/styles and five audio tests removed. Updated Docker npm test passed 10/10; final typecheck/build passed. Timeline tests cover early readiness/minimum cycle, slow readiness/repeats, no respawn in the exit tail and all six lines off-screen. Browser observed loading -> assembling -> ready on desktop and 390x844; captured intermediate panels travelling from upper-left, then black assembled fluting with cyan pointer response. Ready state has one canvas, no loader/buttons and no overflow/errors/warnings. Screenshots: /private/tmp/labyla-assembly-stage.jpg, /private/tmp/labyla-built-background-hover.jpg, /private/tmp/labyla-built-background-mobile.jpg. Slow resource readiness is covered by unit tests; no external media currently exists to throttle in-browser.",
+        "2026-11-02 illuminated assembly: baseline Docker 10 tests and typecheck passed. Updated npm test passes 12/12, including full brightness through the last panel arrival and a monotonic shared fade with an exact common zero endpoint. Docker typecheck/build passed. Internal browser confirmed a transparent text overlay and two canvases during assembling/fading, illuminated panels behind text, then ready with no text and one canvas on desktop and 390x844. No overflow or captured errors/warnings. Screenshots: /private/tmp/labyla-lit-panels-text.jpg, /private/tmp/labyla-fade-start.jpg and /private/tmp/labyla-lit-panels-mobile.jpg.",
+        "2026-11-02 continuous renderer: baseline and final Docker 12/12 tests, typecheck and build passed. Internal browser verified one canvas throughout loading/assembly/fade/ready, live panel refraction in text, vertical 390x844 layout without overflow and no captured errors/warnings. Internal-CDP trace: 1224 animation callbacks, maximum callback duration 12.711ms; two >50ms frame intervals occurred only in the initial 285ms preparation, none afterward. This is local browser evidence, not a physical-device guarantee. Screenshots: /private/tmp/labyla-continuous-glass.jpg and /private/tmp/labyla-continuous-fade.jpg.",
+        "2026-11-02 persistent flow: baseline 12 tests/typecheck passed; updated 14 tests (including trail persistence, decay and stationary-pointer behavior), typecheck and build passed in Docker. Internal browser at 1386x957 confirmed clean glass text without the external dotted contour, live refracted trails remaining along the pointer path, decay and autonomous flute drift. 390x844 confirmed vertical glass text, one canvas, no overflow and completed transition; no captured errors/warnings. Screenshots: /private/tmp/labyla-clean-glass-panels.jpg, /private/tmp/labyla-prisma-trail.jpg, /private/tmp/labyla-restored-flow-mobile.jpg. Standalone Chrome on the owner device has not been independently checked."
+      ],
+      "notes": "Procedural main background; original pink/purple Prisma components retained. Native touch and physical-device performance unverified."
+    }
+  ]
 }
