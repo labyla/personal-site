@@ -1,6 +1,6 @@
 # Agent instructions
 
-This repository is a Next.js App Router personal site written in TypeScript. The active flow is a full-cycle liquid-glass loader, followed by illuminated fluted-panel assembly with the text retained, a shared text/light fade, and cyan hover light. The earlier pink/purple Prisma background is preserved but disabled. Audio has been removed. Use Docker for dependency installation, development, and checks. Use the internal browser for visual verification; do not use Chrome DevTools MCP.
+This repository is a Next.js App Router personal site written in TypeScript. The active flow is a full-cycle liquid-glass loader, followed by illuminated fluted-panel assembly with the text retained, a liquid-text morph into an empty fixed glass menu, and cyan hover light. The earlier pink/purple Prisma background is preserved but disabled. Audio has been removed. Use Docker for dependency installation, development, and checks. Use the internal browser for visual verification; do not use Chrome DevTools MCP.
 
 ## Start here
 

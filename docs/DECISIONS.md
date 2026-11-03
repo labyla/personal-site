@@ -89,3 +89,47 @@ The owner reported loader stalls, a pre-assembly flash and lost text glass. Use 
 ## 2026-11-02 — Persistent flow and autonomous glass motion
 
 The owner reported an external dotted contour around Chrome text and clarified that panels should retain Prisma's cursor trails and autonomous animation. Remove the glyph shader's hard distance cutoff, filter the immediate contour only, and disable numerical texture mipmaps. Port ChromaFlow's velocity/advection/decay model from the installed shaders 4.0.6 dependency into the existing Three.js renderer (momentum 13/radius 3.5), adapting density visibility for cyan on black. Restore rounded cubic flute refraction and 0.15-cell/s drift after the synchronized fade. Keep assembly, palette, loader timing, one canvas and text optics.
+
+
+## 2026-11-03 — Liquid letters become an empty fixed menu
+
+The owner replaced text disappearance with simultaneous melting of all six letters into a fixed horizontal glass menu. Upward motion starts gently, accelerates with quadratic speed growth, brakes near the top and spreads into the menu. Preserve transparency and panel refraction, use soft diffuse cyan light without an opaque tint or bright outline, and give the menu slight frost. Narrow screens retain vertical initial letters and the same horizontal destination. The owner explicitly requested a placeholder without menu items or links.
+
+Implement in the existing Three.js shader: warped glyph distances, capsule morphs and smooth union, rather than importing a Remotion/Framer runtime. RemotionUI documents blur/threshold goo as the source principle; the Framer marketplace page was available, but its linked preview could not be fetched. Local tuning: 3.2s morph after assembly, 2.4s panel dimming, max 720x56px menu with 20px top and minimum 16px side gaps. This supersedes the shared text/light fade decision. Menu content and hosting remain undecided.
+
+
+## 2026-11-03 — Loose shared blot and full-width arrival
+
+The owner approved making both melting letters and the combined mass loose and asymmetric like the supplied blot reference. Merge letters concurrently with the onset of movement, and flow into the whole menu width instead of collecting at the centre before expanding sideways. Preserve the existing glass material and acceleration/braking. Implement a shared connected envelope with moving lobes and indentations, an early glyph-to-envelope blend (first 12% of the 3.2s morph), width growth throughout flight and final smoothing from 72%. No detached droplets or new menu items were requested.
+
+
+## 2026-11-03 — Staggered catch-up into the b seed
+
+The owner replaced simultaneous melting with the corrected order b → y → first a → second l → first l → final a, corresponding to positions 3 → 4 → 2 → 5 → 1 → 6 in labyla. The shared loose mass starts with b. Each later letter begins later, travels faster and flows into the growing mass en route. Preserve the existing irregular glass contour and full-width menu arrival. Local tuning: 160ms start offsets; follower movement durations shorten by 80ms per rank; all meet before the final menu smoothing. Future meeting positions avoid downward detours for upper letters on narrow screens. This supersedes simultaneous-melt requirements in earlier entries.
+
+
+## 2026-11-03 — Continuous fast flow, overlapping menu and vertical order
+
+The owner requested removing intermediate braking and waiting for full collection. Keep only final pool braking near the menu; the last 2–3 letters should flow into the already formed menu. The owner also specified strictly top-to-bottom order (positions 1–6) in vertical mode. Wide-screen order stays 3 → 4 → 2 → 5 → 1 → 6. The pool starts at the first letter in the active order (b horizontally, top l vertically).
+
+Local tuning: reduce overall morph from 3.2s to 2.6s, complete the menu at 70%, and absorb the last three followers at 78/86/94%. Followers use quadratic displacement without individual braking; the pool accelerates through 80% of its flight, then brakes only at final arrival. Start offsets are 260ms with successively shorter follower travel. Smooth pool-area contributions and a common centre for blending mass/menu avoid size pulses and contour collapse. Existing glass optics, blank menu, loader and panel assembly are preserved. This supersedes earlier requirements to merge all letters before final menu formation and use the b order vertically.
+
+
+## 2026-11-03 — Revert full-width sheets
+
+At the owner’s request, revert only the latest full-width sheet and shortened-interval change. Restore compact liquid followers, 260ms start offsets and 78/86/94% late arrivals. Preserve the preceding 2.6s continuous flow, early menu formation and top-to-bottom vertical order.
+
+
+## 2026-11-03 — Closer starts and bounded local spread
+
+After reverting full-width sheets, the owner requested smaller start intervals and only slight lateral spreading when a letter flows into the menu, staying within its width. Use 156ms starts instead of 260ms. Retain compact followers, desktop custom order, vertical top-to-bottom order, 2.6s duration and accelerating motion. Gate widening/flattening to the final approach and cap it by available side space; constrain the joined silhouette at the menu side limits. Followers arrive at 65/68/71/74/77%, preserving shorter catch-up durations and three arrivals after menu formation. Full-width sheets remain reverted.
+
+
+## 2026-11-03 — Exact 120ms start interval
+
+The owner selected 120ms between letter starts. Derive normalized progress from 0.12 / MORPH_SECONDS; retain the existing arrival times, orders, 2.6s morph and bounded local spreading.
+
+
+## 2026-11-03 — Exact 100ms start interval
+
+The owner reduced the start interval from 120ms to 100ms. Use 0.1 / MORPH_SECONDS; preserve all other timing, ordering and glass behavior.
