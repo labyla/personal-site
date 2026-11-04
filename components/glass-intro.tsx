@@ -20,29 +20,33 @@ import { createPanelMaterial } from "./panel-material";
 import { encodeGlyphDistance } from "./glyph-distance";
 import { STRIPE_COUNT, stripePosition } from "./stripe-motion";
 
-import { ASSEMBLY_SECONDS, MORPH_SECONDS, meltProgress, poolTravel, catchUpTravel, letterMeltProgress, letterMeltWindow, transitionLight, LOADING_CYCLE_SECONDS, LOADING_MOTION_SECONDS, shouldFinishLoading } from "./loading-timeline";
+import { ASSEMBLY_SECONDS, MORPH_SECONDS, ballBounce, letterShape, entryVaporProgress, transitionLight, stepEnterHover, entryRevealProgress, ballLayout, letterBallPosition, SECTION_FLIGHT_SECONDS, SECTION_UNFOLD_SECONDS, TRANSITION_SECONDS, sectionLayout, sectionReveal, letterFlightProgress, letterFlightArrival, LOADING_CYCLE_SECONDS, LOADING_MOTION_SECONDS, shouldFinishLoading } from "./loading-timeline";
 
-export type ExperienceStage = "loading" | "assembling" | "melting" | "ready";
+export type ExperienceStage = "loading" | "assembling" | "entering" | "waiting" | "melting" | "ready";
 
 export function GlassIntro({ readyToExit, onStageChange }: {
   readyToExit: boolean; onStageChange: (stage: ExperienceStage) => void;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const enterRef = useRef<HTMLButtonElement>(null);
   const readyRef = useRef(readyToExit);
   const stageRef = useRef(onStageChange);
   useEffect(() => { readyRef.current = readyToExit; stageRef.current = onStageChange; }, [readyToExit, onStageChange]);
 
   useEffect(() => {
     const host = hostRef.current;
-    if (!host) return;
+    const enterButton = enterRef.current;
+    if (!host || !enterButton) return;
 
     const renderer = new WebGLRenderer({ antialias: true });
     const pixelRatio = Math.min(window.devicePixelRatio, 2);
     renderer.setPixelRatio(pixelRatio);
-    host.appendChild(renderer.domElement);
+    renderer.domElement.setAttribute("aria-hidden", "true");
+    host.prepend(renderer.domElement);
     const scene = new Scene();
     const panelScene = new Scene();
     const flow = new PointerFlow();
+    const flowSources = Array.from({ length: 7 }, () => ({ x: 0, y: 0, active: false }));
     const flowTexture = new DataTexture(flow.pixels, FLOW_SIZE, FLOW_SIZE);
     flowTexture.minFilter = flowTexture.magFilter = LinearFilter;
     flowTexture.needsUpdate = true;
@@ -56,13 +60,30 @@ export function GlassIntro({ readyToExit, onStageChange }: {
     const surfaceCanvas = document.createElement("canvas");
     const surfaceContext = surfaceCanvas.getContext("2d")!;
     const surfaceTexture = new CanvasTexture(surfaceCanvas);
-    for (const dataTexture of [texture, surfaceTexture]) {
+    const enterCanvas = document.createElement("canvas");
+    const enterContext = enterCanvas.getContext("2d")!;
+    const enterTexture = new CanvasTexture(enterCanvas);
+    for (const dataTexture of [texture, surfaceTexture, enterTexture]) {
       dataTexture.generateMipmaps = false;
       dataTexture.minFilter = dataTexture.magFilter = LinearFilter;
     }
     let glyphsReady = false;
     const glyphBounds = Array.from({ length: 6 }, () => new Vector4());
     const letterMotion = Array.from({ length: 6 }, () => new Vector4());
+    const ballSquash = new Float32Array(6);
+    const letterShapes = Array.from({ length: 6 }, () => new Vector4());
+    const iconReveal = new Float32Array(6);
+    const sectionRects = [new Vector4(), new Vector4()];
+    const sectionProgress = new Float32Array(2);
+    const entryBounds = new Vector4();
+    const enterBounds = new Vector4();
+    const entryBox = new Vector4();
+    const roundCoverage = (mask: ImageData) => {
+      for (let i = 0; i < mask.data.length; i += 4) {
+        const t = Math.max(0, Math.min(1, (mask.data[i] / 255 - 0.45) / 0.1));
+        mask.data[i] = Math.round(255 * t * t * (3 - 2 * t));
+      }
+    };
 
     const drawWordmark = () => {
       const width = host.clientWidth, height = host.clientHeight;
@@ -108,6 +129,12 @@ export function GlassIntro({ readyToExit, onStageChange }: {
         glyphBounds[index].set((left + right) / 2, height - (top + bottom) / 2,
           (right - left) / 2 + fontSize * 0.035, (bottom - top) / 2 + fontSize * 0.035);
       });
+      const left = Math.min(...glyphBounds.map(b => b.x - b.z));
+      const right = Math.max(...glyphBounds.map(b => b.x + b.z));
+      const bottom = Math.min(...glyphBounds.map(b => b.y - b.w));
+      const top = Math.max(...glyphBounds.map(b => b.y + b.w));
+      const entry = { x: (left + right) / 2, y: (bottom + top) / 2, width: right - left, height: top - bottom };
+      entryBounds.set(entry.x, entry.y, entry.width / 2, entry.height / 2);
       if (vertical) {
         Array.from("labyla").forEach((letter, index) => {
           draw(letter, height / 2 + (index - 2.5) * fontSize * 1.15);
@@ -121,10 +148,7 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       roundedContext.filter = "blur(" + fontSize * 0.012 * maskRatio + "px)";
       roundedContext.drawImage(canvas, 0, 0);
       const glyphs = roundedContext.getImageData(0, 0, canvas.width, canvas.height);
-      for (let i = 0; i < glyphs.data.length; i += 4) {
-        const t = Math.max(0, Math.min(1, (glyphs.data[i] / 255 - 0.45) / 0.1));
-        glyphs.data[i] = Math.round(255 * t * t * (3 - 2 * t));
-      }
+      roundCoverage(glyphs);
       // A smooth height field has no normal-direction jump at a stroke's centre.
       roundedContext.putImageData(glyphs, 0, 0);
       surfaceTexture.dispose();
@@ -136,11 +160,65 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       encodeGlyphDistance(glyphs.data, canvas.width, canvas.height, maskRatio);
       context.putImageData(glyphs, 0, 0);
       texture.needsUpdate = true;
+
+      // A separate packed field draws ENTER behind the unchanged glass wordmark.
+      enterTexture.dispose();
+      enterCanvas.width = canvas.width;
+      enterCanvas.height = canvas.height;
+      enterContext.setTransform(maskRatio, 0, 0, maskRatio, 0, 0);
+      enterContext.fillStyle = "#000000";
+      enterContext.fillRect(0, 0, width, height);
+      enterContext.font = '500 100px Arial';
+      const enterMetrics = enterContext.measureText("ENTER");
+      const enterFont = vertical ? fontSize : Math.min(
+        entry.width / enterMetrics.width * 100,
+        entry.height / (enterMetrics.actualBoundingBoxAscent + enterMetrics.actualBoundingBoxDescent) * 100,
+      );
+      enterContext.font = `500 ${enterFont}px Arial`;
+      enterContext.fillStyle = enterContext.strokeStyle = "#ffffff";
+      enterContext.lineJoin = "round";
+      enterContext.lineWidth = enterFont * 0.055;
+      let enterLeft = width, enterRight = 0, enterBottom = height, enterTop = 0;
+      const drawEnter = (text: string, centreY: number) => {
+        const m = enterContext.measureText(text);
+        const x = width / 2 - (m.actualBoundingBoxRight - m.actualBoundingBoxLeft) / 2;
+        const y = centreY + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
+        enterContext.strokeText(text, x, y);
+        enterContext.fillText(text, x, y);
+        enterLeft = Math.min(enterLeft, x - m.actualBoundingBoxLeft - enterFont * 0.035);
+        enterRight = Math.max(enterRight, x + m.actualBoundingBoxRight + enterFont * 0.035);
+        enterBottom = Math.min(enterBottom, height - y - m.actualBoundingBoxDescent - enterFont * 0.035);
+        enterTop = Math.max(enterTop, height - y + m.actualBoundingBoxAscent + enterFont * 0.035);
+      };
+      if (vertical) Array.from("ENTER").forEach((letter, i) => drawEnter(letter, height / 2 + (i - 2) * enterFont * 1.15));
+      else drawEnter("ENTER", height / 2);
+      // Rasterize vectors at their final display size instead of stretching the SDF.
+      const sourceX = (enterLeft + enterRight) / 2;
+      const sourceY = height - (enterBottom + enterTop) / 2;
+      const scaleX = entry.width * 1.12 / (enterRight - enterLeft);
+      const scaleY = entry.height * 1.12 / (enterTop - enterBottom);
+      enterContext.fillStyle = "#000000";
+      enterContext.fillRect(0, 0, width, height);
+      enterContext.setTransform(maskRatio * scaleX, 0, 0, maskRatio * scaleY,
+        (entry.x - sourceX * scaleX) * maskRatio,
+        (height - entry.y - sourceY * scaleY) * maskRatio);
+      enterContext.fillStyle = "#ffffff";
+      if (vertical) Array.from("ENTER").forEach((letter, i) => drawEnter(letter, height / 2 + (i - 2) * enterFont * 1.15));
+      else drawEnter("ENTER", height / 2);
+      enterBounds.set(entry.x, entry.y, entry.width * 0.56, entry.height * 0.56);
+      roundedContext.clearRect(0, 0, canvas.width, canvas.height);
+      roundedContext.filter = `blur(${0.6 * maskRatio}px)`;
+      roundedContext.drawImage(enterCanvas, 0, 0);
+      const enterMask = roundedContext.getImageData(0, 0, canvas.width, canvas.height);
+      encodeGlyphDistance(enterMask.data, canvas.width, canvas.height, maskRatio);
+      enterContext.putImageData(enterMask, 0, 0);
+      enterTexture.needsUpdate = true;
       glyphsReady = true;
     };
 
     const uniforms = {
       wordmark: { value: texture },
+      enterWordmark: { value: enterTexture },
       surface: { value: surfaceTexture },
       resolution: { value: new Vector2(1, 1) },
       viewSize: { value: new Vector2(10, 7.3) },
@@ -148,21 +226,37 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       panelMode: { value: 0 },
       panels: { value: panelTarget.texture },
       morph: { value: 0 },
-      travel: { value: 0 },
+      entryProgress: { value: 0 },
+      entryVapor: { value: 0 },
+      enterSourceRect: { value: enterBounds },
+      surfaceTime: { value: 0 },
+      entryHover: { value: 0 },
+      entryRect: { value: new Vector4() },
+      entryScale: { value: new Vector2(1, 1) },
       glyphBounds: { value: glyphBounds },
+      ballRadius: { value: 42 },
       letterMotion: { value: letterMotion },
-      seedIndex: { value: 2 },
+      ballSquash: { value: ballSquash },
+      letterShapes: { value: letterShapes },
+      iconReveal: { value: iconReveal },
+      sectionRects: { value: sectionRects },
+      sectionProgress: { value: sectionProgress },
     };
     const material = new ShaderMaterial({
       uniforms,
       vertexShader: `varying vec2 vUv;
         void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
       fragmentShader: `
-        uniform sampler2D wordmark, surface, panels;
-        uniform float panelMode, morph, travel;
+        uniform sampler2D wordmark, enterWordmark, surface, panels;
+        uniform float panelMode, morph, ballRadius, entryProgress, entryVapor, surfaceTime, entryHover;
+        uniform vec4 entryRect, enterSourceRect;
+        uniform vec2 entryScale;
         uniform vec4 glyphBounds[6];
         uniform vec4 letterMotion[6];
-        uniform int seedIndex;
+        uniform float ballSquash[6], iconReveal[6];
+        uniform vec4 letterShapes[6];
+        uniform vec4 sectionRects[2];
+        uniform float sectionProgress[2];
         uniform vec2 resolution, viewSize;
         uniform float stripePositions[${STRIPE_COUNT}];
         varying vec2 vUv;
@@ -179,8 +273,38 @@ export function GlassIntro({ readyToExit, onStageChange }: {
           return 1.0 - smoothstep(0.2375 - antialias, 0.2375 + antialias, distanceToStripe);
         }
 
+        vec3 rearEnter(vec2 uv, vec3 base) {
+          if (entryProgress <= 0.0 || entryVapor >= 1.0) return base;
+          vec2 p = uv * resolution;
+          float vapor = entryVapor * entryVapor * (3.0 - 2.0 * entryVapor);
+          vec2 local = p - entryRect.xy - vec2(sin(p.y * 0.03 + surfaceTime) * vapor * 5.0, vapor * 28.0);
+          vec2 target = entryRect.zw * 1.12 * entryScale;
+          vec2 source = enterSourceRect.xy + local / target * enterSourceRect.zw;
+          vec2 sampleUv = source / resolution;
+          vec2 stepUv = vec2(0.75) / resolution;
+          vec4 mask = texture2D(enterWordmark, sampleUv);
+          vec2 packed = mask.gb * 0.4
+            + (texture2D(enterWordmark, sampleUv + vec2(stepUv.x, 0.0)).gb
+            + texture2D(enterWordmark, sampleUv - vec2(stepUv.x, 0.0)).gb
+            + texture2D(enterWordmark, sampleUv + vec2(0.0, stepUv.y)).gb
+            + texture2D(enterWordmark, sampleUv - vec2(0.0, stepUv.y)).gb) * 0.15;
+          float d = (dot(packed, vec2(255.0, 255.0 / 256.0)) - 128.0)
+            * min(target.x / enterSourceRect.z, target.y / enterSourceRect.w);
+          float softness = mix(1.0, 10.0, vapor);
+          float coverage = mix(mask.r, 1.0 - smoothstep(-softness, softness, d), smoothstep(0.0, 0.2, vapor));
+          float reveal = smoothstep(0.05, 1.0, entryProgress) * pow(1.0 - vapor, 2.0);
+          float shimmer = 0.5 + 0.5 * sin(local.x / max(target.x, 1.0) * 2.5
+            + local.y / max(target.y, 1.0) - surfaceTime * 0.75);
+          vec3 tint = mix(vec3(0.005, 0.055, 0.10), vec3(0.0, 0.92, 0.95), shimmer);
+          vec3 color = mix(base, tint * (0.55 + entryHover * 0.45), coverage * reveal);
+          float glow = exp(-max(d, 0.0) / mix(8.0, 22.0, entryHover));
+          float litContour = exp(-pow(d / 1.8, 2.0)) * smoothstep(0.25, 0.8, shimmer);
+          vec3 contourLight = vec3(0.025, 0.28, 0.30) * litContour * (0.65 + entryHover * 0.35);
+          return color + (vec3(0.015, 0.15, 0.17) * glow * (0.18 + entryHover * 1.8) + contourLight) * reveal;
+        }
+
         vec3 background(vec2 uv) {
-          if (panelMode > 0.5) return texture2D(panels, uv).rgb;
+          if (panelMode > 0.5) return rearEnter(uv, texture2D(panels, uv).rgb);
           float along = dot((uv - 0.5) * viewSize, vec2(0.7071, -0.7071));
           float fade = smoothstep(-5.0, 5.0, along);
           vec3 tint = mix(vec3(0.0, 0.92, 0.95), vec3(0.005, 0.055, 0.10), fade);
@@ -192,86 +316,67 @@ export function GlassIntro({ readyToExit, onStageChange }: {
           return dot(packed, vec2(255.0, 255.0 / 256.0)) - 128.0;
         }
 
+        float segment(vec2 p, vec2 a, vec2 b) {
+          vec2 v = b - a;
+          return length(p - a - v * clamp(dot(p - a, v) / dot(v, v), 0.0, 1.0));
+        }
+
+        // Six temporary line icons: home, search, folder, heart, grid, envelope.
+        float iconDistance(vec2 p, int icon) {
+          if (icon == 0) return min(min(segment(p, vec2(-0.5, 0.0), vec2(0.0, 0.45)), segment(p, vec2(0.0, 0.45), vec2(0.5, 0.0))),
+            min(min(segment(p, vec2(-0.35, 0.1), vec2(-0.35, -0.4)), segment(p, vec2(0.35, 0.1), vec2(0.35, -0.4))), segment(p, vec2(-0.35, -0.4), vec2(0.35, -0.4))));
+          if (icon == 1) return min(abs(length(p - vec2(-0.1, 0.1)) - 0.32), segment(p, vec2(0.14, -0.14), vec2(0.46, -0.46)));
+          if (icon == 2) return min(abs(max(abs(p.x) - 0.48, abs(p.y + 0.08) - 0.3)), segment(p, vec2(-0.45, 0.38), vec2(-0.05, 0.38)));
+          if (icon == 3) {
+            p.x = abs(p.x);
+            return min(abs(length(p - vec2(0.22, 0.18)) - 0.24) + step(p.y, 0.12) * 2.0,
+              segment(p, vec2(0.45, 0.1), vec2(0.0, -0.46)));
+          }
+          if (icon == 4) return abs(max(abs(abs(p.x) - 0.27) - 0.16, abs(abs(p.y) - 0.27) - 0.16));
+          return min(abs(max(abs(p.x) - 0.5, abs(p.y) - 0.34)),
+            min(segment(p, vec2(-0.46, 0.28), vec2(0.0, -0.06)), segment(p, vec2(0.46, 0.28), vec2(0.0, -0.06))));
+        }
+
         float roundBox(vec2 p, vec2 halfSize, float radius) {
           vec2 q = abs(p) - halfSize + radius;
           return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - radius;
         }
 
-        float mergeGlass(float a, float b, float softness) {
-          float h = max(softness - abs(a - b), 0.0) / softness;
-          return min(a, b) - h * h * softness * 0.25;
+        vec2 ballLocal(vec2 p, int index) {
+          vec2 centre = letterMotion[index].yz;
+          if (index == 5) centre = mix(centre, sectionRects[0].xy, sectionProgress[0]);
+          if (index == 4) centre = mix(centre, sectionRects[1].xy, sectionProgress[1]);
+          vec2 local = p - centre;
+          float squash = 1.0 - ballSquash[index] * 0.14;
+          local *= vec2(1.0 / squash, squash);
+          vec2 direction = vec2(cos(letterMotion[index].w), sin(letterMotion[index].w));
+          float stretch = 1.0 + letterShapes[index].w;
+          vec2 along = direction * dot(local, direction);
+          return along / stretch + (local - along) * sqrt(stretch);
         }
 
         float glyphDistance(vec2 uv) {
-          if (morph <= 0.0) return sourceDistance(uv);
           vec2 p = uv * resolution;
-          float menuWidth = min(720.0, resolution.x - 32.0);
-          vec2 menuCentre = vec2(resolution.x * 0.5, resolution.y - 48.0);
-          if (morph >= 1.0) return roundBox(p - menuCentre, vec2(menuWidth * 0.5, 28.0), 22.0);
-          float settle = smoothstep(0.48, 0.7, morph);
-          vec4 seed = glyphBounds[seedIndex];
-          float seedMelt = smoothstep(0.0, 0.85, letterMotion[seedIndex].x);
-          float area = seed.z * seed.w;
-          for (int i = 0; i < 6; i++) {
-            if (i == seedIndex) continue;
-            area += glyphBounds[i].z * glyphBounds[i].w * smoothstep(0.0, 1.0, letterMotion[i].x);
+          if (morph <= 0.0) {
+            return sourceDistance(uv);
           }
-          vec2 centre = mix(seed.xy, menuCentre, travel);
-          // The first letter seeds the pool; arriving letters add its visible volume.
-          vec2 gatheredSize = mix(seed.zw, sqrt(area) * vec2(0.95, 0.7), seedMelt);
-          vec2 halfSize = vec2(mix(gatheredSize.x, menuWidth * 0.5, travel),
-            exp(mix(log(gatheredSize.y), log(28.0), travel)));
-          vec2 local = p - centre;
-          vec2 unit = local / halfSize;
-          float angle = atan(unit.y, unit.x);
-          float looseness = sin(seedMelt * 1.5707963) * (1.0 - settle);
-          float lobes = sin(angle * 3.0 + morph * 2.5) * 0.12
-            + sin(angle * 5.0 - morph * 3.0 + 0.9) * 0.10
-            + sin(angle * 8.0 + morph * 2.0 + 1.6) * 0.045;
-          // Unequal lobes and a slowly flexing centreline keep the entire mass loose.
-          vec2 warped = local;
-          warped.y += sin(unit.x * 5.0 + morph * 4.0) * halfSize.y * 0.20 * looseness;
-          warped.x += sin(unit.y * 5.0 - morph * 3.0 + 0.7) * halfSize.x * 0.09 * looseness;
-          float radius = min(halfSize.x, halfSize.y) * 0.85;
-          float pool = roundBox(warped, halfSize, radius)
-            - lobes * min(halfSize.x, halfSize.y) * 1.5 * looseness;
-          float menu = roundBox(p - centre, vec2(menuWidth * 0.5, 28.0), 22.0);
-          pool = mix(pool, menu, settle);
-          vec2 seedPoint = clamp(p - centre, -seed.zw, seed.zw);
-          float seedGlyph = sourceDistance((seedPoint + seed.xy) / resolution)
-            + length(p - centre - seedPoint);
-          float result = mix(seedGlyph, pool, seedMelt);
+          float result = 10000.0;
           for (int i = 0; i < 6; i++) {
-            if (i == seedIndex || letterMotion[i].x >= 1.0) continue;
             vec4 bounds = glyphBounds[i];
-            float progress = letterMotion[i].x;
-            float melt = smoothstep(0.0, 0.42, progress);
-            // Followers catch different parts of the moving pool, across its width.
-            vec2 arrivalCentre = mix(seed.xy, menuCentre, letterMotion[i].z);
-            vec2 attachment = arrivalCentre + vec2((float(i) - 2.5) / 2.5 * halfSize.x * 0.62, 0.0);
-            vec2 letterCentre = mix(bounds.xy, attachment, letterMotion[i].y);
-            vec2 localLetter = p - letterCentre;
-            vec2 source = localLetter;
-            source.x += sin(source.y * 0.045 + float(i) * 1.7 + progress * 5.0) * bounds.z * 0.3 * melt;
+            vec4 shape = letterShapes[i];
+            vec2 local = ballLocal(p, i) / shape.z;
+            float sourceScale = mix(1.0, 0.55, shape.x);
+            vec2 source = local / sourceScale;
             vec2 samplePoint = clamp(source, -bounds.zw, bounds.zw);
-            float glyph = sourceDistance((samplePoint + bounds.xy) / resolution)
-              + length(source - samplePoint);
-            vec2 dropSize = mix(bounds.zw * 0.9, min(bounds.zw * 0.9, halfSize * vec2(0.18, 0.4)),
-              smoothstep(0.55, 1.0, progress));
-            // A small sideways release only as the drop reaches the menu.
-            float spread = smoothstep(0.65, 0.95, progress)
-              * (1.0 - smoothstep(24.0, 100.0, abs(letterCentre.y - menuCentre.y)));
-            float room = max(2.0, menuWidth * 0.5 - abs(letterCentre.x - menuCentre.x) - 10.0);
-            dropSize.x = mix(dropSize.x, min(dropSize.x * 1.65, room), spread);
-            dropSize.y *= 1.0 - spread * 0.35;
-            float drop = roundBox(localLetter, dropSize, min(dropSize.x, dropSize.y))
-              - sin(atan(localLetter.y, localLetter.x) * 3.0 + progress * 4.0) * min(dropSize.x, dropSize.y) * 0.16 * melt;
-            float letter = mix(glyph, drop, melt);
-            result = mergeGlass(result, letter, 1.0 + 15.0 * melt);
+            float glyph = (sourceDistance((samplePoint + bounds.xy) / resolution) + length(source - samplePoint))
+              * sourceScale;
+            float radius = mix(ballRadius * 0.58, ballRadius, shape.y);
+            float drop = length(local) - radius;
+            if (i == 5) drop = roundBox(local, mix(vec2(radius), sectionRects[0].zw, sectionProgress[0]), mix(radius, 22.0, sectionProgress[0]));
+            if (i == 4) drop = roundBox(local, mix(vec2(radius), sectionRects[1].zw, sectionProgress[1]), mix(radius, 22.0, sectionProgress[1]));
+            result = min(result, mix(glyph, drop, shape.x) * shape.z);
           }
-          // Confine the joined liquid at the menu; widen the guard below it.
-          float menuSides = abs(p.x - menuCentre.x) - menuWidth * 0.5;
-          return max(result, menuSides - max(menuCentre.y - 28.0 - p.y, 0.0));
+          return result;
         }
 
         void main() {
@@ -288,8 +393,10 @@ export function GlassIntro({ readyToExit, onStageChange }: {
             + glyphDistance(vUv + vec2(0.0, contourStep.y))
             + glyphDistance(vUv - vec2(0.0, contourStep.y))) * 0.15;
 
-          float liquid = smoothstep(0.0, 0.22, morph);
-          color += vec3(0.0, 0.026, 0.03) * exp(-max(d, 0.0) / 18.0) * liquid;
+          float liquid = smoothstep(0.0, 0.7, entryProgress);
+          float flying = smoothstep(0.0, 0.22, morph);
+          float entrySurface = liquid * (1.0 - flying);
+          color += vec3(0.009, 0.014, 0.015) * exp(-pow(max(d, 0.0) / 28.0, 2.0)) * liquid;
           // Bencho dark preset: Size 230, Bend 100, Fringe 40.
           float shadowDistance = glyphDistance(vUv + vec2(0.0, 9.0) / resolution);
           float shadow = (1.0 - smoothstep(-8.0, 26.0, shadowDistance)) * 0.3;
@@ -302,11 +409,18 @@ export function GlassIntro({ readyToExit, onStageChange }: {
               texture2D(surface, vUv + vec2(e.x, e.y)).r + 2.0 * texture2D(surface, vUv + vec2(0.0, e.y)).r + texture2D(surface, vUv + vec2(-e.x, e.y)).r
                 - texture2D(surface, vUv + vec2(e.x, -e.y)).r - 2.0 * texture2D(surface, vUv - vec2(0.0, e.y)).r - texture2D(surface, vUv - e).r
             ) / 4.0;
-            if (morph > 0.0) {
+            if (entryProgress > 0.0) {
               vec2 gradient = vec2(glyphDistance(vUv + vec2(e.x, 0.0)) - glyphDistance(vUv - vec2(e.x, 0.0)),
                 glyphDistance(vUv + vec2(0.0, e.y)) - glyphDistance(vUv - vec2(0.0, e.y))) / 3.0;
               slope = mix(slope, -gradient * 0.18 * exp(min(d, 0.0) / 16.0), liquid);
             }
+            // Broad travelling ripples bend light through the clickable wordmark.
+            vec2 wavePoint = (p - entryRect.xy) / max(entryRect.w, 1.0);
+            float phase = wavePoint.x * 2.8 + wavePoint.y * 2.0 - surfaceTime * 0.75;
+            float crossPhase = wavePoint.x * -1.7 + wavePoint.y * 2.8 - surfaceTime * 0.48;
+            vec2 waveSlope = vec2(2.8, 2.0) * cos(phase) * 0.018
+              + vec2(-1.7, 2.8) * cos(crossPhase) * 0.012;
+            slope += waveSlope * entrySurface;
             vec2 normal = normalize(vec3(-slope * 8.0, 1.0)).xy;
             float radius = 230.0 / 2.0;
             float bevel = min(radius, max(22.0, radius * 0.36));
@@ -318,20 +432,37 @@ export function GlassIntro({ readyToExit, onStageChange }: {
             vec2 q = (magnified + offset) / resolution;
             vec2 fringe = offset * 0.4 / resolution;
             vec3 glass = vec3(background(q + fringe).r, background(q).g, background(q - fringe).b);
-            vec2 frost = vec2(2.2) / resolution;
+            vec2 frost = vec2(mix(2.2, 6.0, flying)) / resolution;
             vec3 blurred = (background(q + vec2(frost.x, 0.0)) + background(q - vec2(frost.x, 0.0))
-              + background(q + vec2(0.0, frost.y)) + background(q - vec2(0.0, frost.y)) + glass * 4.0) / 8.0;
-            glass = mix(glass, blurred, liquid * 0.65);
+              + background(q + vec2(0.0, frost.y)) + background(q - vec2(0.0, frost.y)) + glass * 2.0) / 6.0;
+            glass = mix(glass, blurred, flying * 0.9);
+            float waveLight = pow(0.5 + 0.5 * sin(phase), 3.0) * 0.65
+              + pow(0.5 + 0.5 * sin(crossPhase), 3.0) * 0.35;
+            glass += vec3(0.012, 0.038, 0.042) * waveLight * entrySurface;
             vec2 lightDirection = normalize(vec2(-0.55, 0.85));
             float rim = smoothstep(0.0, 1.6, -d) * (1.0 - smoothstep(1.6, 4.5, -d));
             float lit = max(dot(normal, lightDirection), 0.0);
             float far = max(dot(normal, -lightDirection), 0.0);
             float light = rim * (0.18 + 0.75 * lit) + rim * far * 0.22 + edge * 0.08;
-            glass = clamp(glass * mix(1.08, 1.0, liquid) + light * mix(vec3(1.0), vec3(0.035, 0.085, 0.09), liquid)
-              + vec3(0.008, 0.012, 0.014) * liquid, 0.0, 1.0);
+            glass = clamp(glass * mix(1.08, 1.0, flying) + light * mix(vec3(1.0), vec3(0.035, 0.085, 0.09), flying)
+              + vec3(0.020, 0.024, 0.026) * flying, 0.0, 1.0);
             float aa = max(0.75, fwidth(distance) * 0.75);
-            float coverage = morph <= 0.0 ? texture2D(wordmark, vUv).r : 1.0 - smoothstep(-aa, aa, d);
+            float coverage = entryProgress <= 0.0 ? texture2D(wordmark, vUv).r : 1.0 - smoothstep(-aa, aa, d);
             color = mix(color, glass, coverage);
+          }
+          float contourGlow = exp(-pow(d / 1.6, 2.0)) * 0.75
+            + exp(-pow(d / 7.0, 2.0)) * 0.22;
+          color += vec3(0.035, 0.085, 0.09) * contourGlow * entrySurface;
+          if (morph > 0.0) {
+            for (int i = 0; i < 6; i++) {
+              // Content resolves separately and stays crisp as the glass settles.
+              vec2 local = (p - letterMotion[i].yz) / (ballRadius * 0.74);
+              float softness = mix(0.14, 1.2 / ballRadius, iconReveal[i]);
+              float icon = 1.0 - smoothstep(0.035, 0.035 + softness, iconDistance(local, 5 - i));
+              float visibility = iconReveal[i];
+              if (i == 5) visibility *= 1.0 - sectionProgress[0];
+              color = mix(color, vec3(0.32), icon * visibility);
+            }
           }
           gl_FragColor = vec4(color, 1.0);
           // Match Bencho: its optical arithmetic outputs display RGB directly.
@@ -347,14 +478,33 @@ export function GlassIntro({ readyToExit, onStageChange }: {
     let start: number | undefined;
     let previousElapsed = 0;
     let buildStart: number | undefined;
+    let splitStart: number | undefined;
+    let enterRequested = false;
+    let enterHovered = false;
+    let hover = { value: 0, velocity: 0 };
     let stage: ExperienceStage = "loading";
     let prepared = false;
     let pointerInside = false;
     let previousFrame: number | undefined;
     const changeStage = (next: ExperienceStage) => {
       stage = next;
+      host.dataset.stage = next;
+      enterButton.disabled = next !== "waiting";
+      enterButton.setAttribute("aria-hidden", String(next !== "waiting"));
       stageRef.current(next);
     };
+    const requestEnter = () => {
+      if (stage === "waiting" && !enterRequested) enterRequested = true;
+    };
+    const hoverEnter = () => { enterHovered = true; };
+    const leaveEnter = () => { enterHovered = enterButton.matches(":focus-visible"); };
+    const blurEnter = () => { enterHovered = enterButton.matches(":hover"); };
+    enterButton.addEventListener("click", requestEnter);
+    enterButton.addEventListener("pointerenter", hoverEnter);
+    enterButton.addEventListener("pointerleave", leaveEnter);
+    enterButton.addEventListener("focus", hoverEnter);
+    enterButton.addEventListener("blur", blurEnter);
+    host.dataset.stage = "loading";
     const resize = new ResizeObserver(() => {
       const nextWidth = host.clientWidth, nextHeight = host.clientHeight;
       if (nextWidth === width && nextHeight === height) return;
@@ -368,7 +518,7 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       renderer.setSize(width, height);
       panelTarget.setSize(Math.round(width * pixelRatio), Math.round(height * pixelRatio));
       host.dataset.layout = width < 640 ? "vertical" : "horizontal";
-      uniforms.seedIndex.value = width < 640 ? 0 : 2;
+      uniforms.ballRadius.value = ballLayout(width).radius;
       drawWordmark();
       prepared = false;
     });
@@ -404,18 +554,61 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       }
       if (buildStart !== undefined) {
         const buildTime = (now - buildStart) / 1000;
-        const light = transitionLight(buildTime);
-        panelMaterial.uniforms.buildTime.value = buildTime;
-        panelMaterial.uniforms.assemblyLight.value = light;
-        uniforms.panelMode.value = 1;
-        uniforms.morph.value = meltProgress(buildTime);
-        uniforms.travel.value = poolTravel(uniforms.morph.value);
-        for (let i = 0; i < 6; i++) {
-          const progress = letterMeltProgress(uniforms.morph.value, i, width < 640);
-          letterMotion[i].set(progress, catchUpTravel(progress), poolTravel(letterMeltWindow(i, width < 640).end), 0);
+        if (stage === "assembling" && buildTime >= ASSEMBLY_SECONDS) changeStage("entering");
+        uniforms.entryProgress.value = entryRevealProgress(buildTime);
+        if (stage === "entering" && uniforms.entryProgress.value >= 1) changeStage("waiting");
+        if (enterRequested && splitStart === undefined) {
+          splitStart = now;
+          changeStage("melting");
         }
-        if (stage === "assembling" && buildTime >= ASSEMBLY_SECONDS) changeStage("melting");
-        if (stage === "melting" && buildTime >= ASSEMBLY_SECONDS + MORPH_SECONDS) changeStage("ready");
+        const sinceActivation = splitStart === undefined ? undefined : (now - splitStart) / 1000;
+        uniforms.entryVapor.value = entryVaporProgress(sinceActivation);
+        if (splitStart === undefined) {
+          hover = stepEnterHover(hover.value, hover.velocity, stage === "waiting" && enterHovered, dt);
+        }
+        uniforms.entryHover.value = Math.max(0, Math.min(1, hover.value));
+        const sx = 1 + hover.value * 0.045 + hover.velocity * 0.001;
+        const sy = 1 + hover.value * 0.045 - hover.velocity * 0.001;
+        uniforms.entryScale.value.set(sx, sy);
+        entryBox.copy(entryBounds);
+        uniforms.entryRect.value.copy(entryBox);
+        enterButton.style.left = `${entryBox.x}px`;
+        enterButton.style.top = `${height - entryBox.y}px`;
+        enterButton.style.width = `${entryBox.z * 2 * 1.12}px`;
+        enterButton.style.height = `${entryBox.w * 2 * 1.12}px`;
+        enterButton.style.transform = `translate(-50%, -50%) scale(${sx}, ${sy})`;
+        const sinceFlight = sinceActivation ?? 0;
+        panelMaterial.uniforms.buildTime.value = buildTime;
+        panelMaterial.uniforms.assemblyLight.value = transitionLight(buildTime);
+        uniforms.panelMode.value = 1;
+        uniforms.morph.value = Math.min(1, sinceFlight / MORPH_SECONDS);
+        const sections = sectionLayout(width, height);
+        [sections.menu, sections.block].forEach((rect, index) => {
+          sectionRects[index].set(rect.x, rect.y, rect.width / 2, rect.height / 2);
+          sectionProgress[index] = splitStart === undefined ? 0 : sectionReveal(sinceFlight, 5 - index);
+        });
+        for (let i = 0; i < 6; i++) {
+          const progress = letterFlightProgress(sinceFlight, i);
+          const arrival = letterFlightArrival(i);
+          const sinceArrival = sinceFlight - arrival - (i >= 4 ? SECTION_UNFOLD_SECONDS : 0);
+          ballSquash[i] = ballBounce(sinceArrival);
+          const shape = letterShape(progress, sinceArrival);
+          iconReveal[i] = splitStart === undefined ? 0 : shape.icon;
+          const bounds = glyphBounds[i];
+          const x = bounds.x;
+          const y = bounds.y;
+          const position = letterBallPosition(progress, i, x, y, width, height);
+          const before = letterBallPosition(Math.max(0, progress - 0.001), i, x, y, width, height);
+          const after = letterBallPosition(Math.min(1, progress + 0.001), i, x, y, width, height);
+          const speed = Math.hypot(after.x - before.x, after.y - before.y)
+            / (0.002 * (i >= 4 ? SECTION_FLIGHT_SECONDS : MORPH_SECONDS - 0.5) * Math.max(width, height));
+          letterShapes[i].set(shape.gather, shape.open, shape.size, Math.min(0.24, speed * 0.16));
+          letterMotion[i].set(progress, position.x, position.y, Math.atan2(after.y - before.y, after.x - before.x));
+          flowSources[i + 1].x = position.x / width;
+          flowSources[i + 1].y = position.y / height;
+          flowSources[i + 1].active = splitStart !== undefined && progress > 0 && progress < 1;
+        }
+        if (stage === "melting" && sinceFlight >= TRANSITION_SECONDS) changeStage("ready");
       } else {
         const phase = (elapsed % LOADING_CYCLE_SECONDS) / LOADING_MOTION_SECONDS;
         for (let i = 0; i < STRIPE_COUNT; i++) {
@@ -423,12 +616,16 @@ export function GlassIntro({ readyToExit, onStageChange }: {
         }
       }
       const pointer = panelMaterial.uniforms.pointer.value;
-      if (flow.update(dt, pointer.x, pointer.y, stage === "ready" && pointerInside, width / height)) {
+      flowSources[0].x = pointer.x;
+      flowSources[0].y = pointer.y;
+      flowSources[0].active = stage === "ready" && pointerInside;
+      if (flow.updateMany(dt, flowSources, width / height)) {
         flowTexture.needsUpdate = true;
       }
+      uniforms.surfaceTime.value = elapsed;
       panelMaterial.uniforms.time.value = elapsed;
-      panelMaterial.uniforms.driftTime.value = buildStart === undefined ? 0
-        : Math.max(0, (now - buildStart) / 1000 - ASSEMBLY_SECONDS - MORPH_SECONDS);
+      panelMaterial.uniforms.driftTime.value = splitStart === undefined ? 0
+        : Math.max(0, (now - splitStart) / 1000 - TRANSITION_SECONDS);
       if (buildStart !== undefined) {
         renderer.setRenderTarget(panelTarget);
         renderer.render(panelScene, camera);
@@ -440,6 +637,11 @@ export function GlassIntro({ readyToExit, onStageChange }: {
 
     return () => {
       resize.disconnect();
+      enterButton.removeEventListener("click", requestEnter);
+      enterButton.removeEventListener("pointerenter", hoverEnter);
+      enterButton.removeEventListener("pointerleave", leaveEnter);
+      enterButton.removeEventListener("focus", hoverEnter);
+      enterButton.removeEventListener("blur", blurEnter);
       host.removeEventListener("pointerenter", move);
       host.removeEventListener("pointermove", move);
       host.removeEventListener("pointerleave", leave);
@@ -450,11 +652,14 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       panelTarget.dispose();
       flowTexture.dispose();
       texture.dispose();
+      enterTexture.dispose();
       surfaceTexture.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     };
   }, []);
 
-  return <div ref={hostRef} className="glass-intro" aria-hidden="true" />;
+  return <div ref={hostRef} className="glass-intro">
+    <button ref={enterRef} className="enter-button" type="button" disabled aria-hidden="true" aria-label="Enter site" />
+  </div>;
 }

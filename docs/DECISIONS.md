@@ -133,3 +133,86 @@ The owner selected 120ms between letter starts. Derive normalized progress from 
 ## 2026-11-03 — Exact 100ms start interval
 
 The owner reduced the start interval from 120ms to 100ms. Use 0.1 / MORPH_SECONDS; preserve all other timing, ordering and glass behavior.
+
+
+## 2026-11-03 — Elastic Liquid Glass contact
+
+After reviewing Chan Karunamuni's Liquid Glass animation (https://x.com/chan_k/status/1932185261162766459), the owner requested trying similar motion for the text-to-menu transition. Adapt the observed directed stretching, short rounded necks, local relaxation and damped overshoot to letter absorption. Preserve 100ms starts, both layout orders, the 2.6s timeline, early empty menu and late arrivals. Replace continuous contour waves with travel-aligned glyph deformation and distance-gated meniscus connections. Keep the existing shader and material; no physical-simulation dependency. Tuning values are a first local interpretation for owner review, not measured Apple spring parameters. This supersedes the earlier continuous loose-lobe and sideways-spread geometry requirements.
+
+
+## 2026-11-04 — Six independent glass balls
+
+The owner approved replacing the upper menu with six separate glass balls inspired by the supplied circular glass controls. Reverse the letter order in both layouts: last-to-first horizontally and bottom-to-top vertically. Each glyph starts moving while melting, follows the drawn broad arc right/down/left, and finishes in a bottom row. Fill the row left-to-right in arrival order; use arbitrary white icons for now. No navigation destinations are invented. Keep the loader, panel assembly, 100ms starts and 2.6s morph; tune individual flights to 2.1s. This supersedes the shared upper-menu, absorption and contact-recoil geometry.
+
+
+## 2026-11-04 — Loading-line speed and jelly arrival
+
+The owner requested copying the loading lines' speed changes to the travelling objects and adding a jelly-like bounce at their destinations. Share the existing cubic movement function; combine departure acceleration and mirrored approach braking without the loading loop's central hold. On arrival, apply 0.7s of independently timed damped horizontal squash and reciprocal vertical stretch to each ball, including its glass shading and icon. Keep flights at 2.1s each and 100ms starts; finish ready after the final bounce, at 3.3s from morph start.
+
+
+## 2026-11-04 — Reference-style letter contraction and lens opening
+
+The owner requested applying the reviewed Chan Karunamuni Liquid Glass effects to the current letter animations. Keep six independent balls, reverse order, 100ms starts, 2.1s flights, the 2.6s overall morph and existing trajectories. Each glyph gathers into a compact lens, travels with speed-dependent stretch, and opens near arrival. Replace the previous 0.7s repeated jelly bounce with a 0.4s size overshoot/smaller rebound and gentle glass squash. Reveal/resolve icons separately without distorting them with the shell. Derive broad reflection and refraction from the evolving surface rather than adding independent circular highlights. No joining bridges are introduced for intentionally separate buttons. Values adapt the reference; they are not recovered Apple parameters.
+
+
+## 2026-11-04 — Use the removed menu material on the buttons
+
+The owner rejected the current button appearance and requested the removed menu's design. Restore its exact glass-material block from commit 07c88c6: 16px surface-slope falloff, existing refraction/fringe, five-sample frost, soft cyan rim/glow and shadow. Remove the newer broad spherical reflection. Keep the six circular silhouettes, icons, layout and reference-style letter animation. This supersedes the added broad-reflection styling, not the motion.
+
+
+## 2026-11-04 — Matte buttons and muted smaller icons
+
+The owner requested more frost, slightly smaller gray icons matching the supplied dark-gray icon reference, and a very weak diffuse button glow. Retain existing icon outlines, circle size, animation and menu-derived optics. Reduce icon scale from 0.90 to 0.74 of ball radius (about 18%), use neutral display gray 0.32, increase transmitted-background frost to 6px/90% blend with a subtle matte veil, and replace the previous cyan exponential halo with a weaker neutral/cyan 28px Gaussian falloff. This refines the restored menu material; no navigation behavior is added.
+
+
+## 2026-11-04 — ENTER gateway before the bottom controls
+
+The owner requested a new entry concept and confirmed a horizontal mobile button and panel dimming only after activation. After the existing loader and illuminated panel assembly, morph labyla into one matte glass ENTER button over 1.1s. Desktop button bounds match the measured wordmark; below 640px use a centered horizontal button (up to 320x80px). Keep panels fully lit while waiting indefinitely. ENTER has an animated turquoise/deep-teal gradient and brightens on hover/focus; a damped spring increases the glass and hit area by about 4.5%. Use the current matte button material with more frost/darkening for the large surface.
+
+Native button activation (pointer, keyboard or touch-generated click) starts the existing 2.6s, right-to-left, 100ms-staggered bottom-control sequence, now sourced from six sections of the large button instead of glyphs. The remaining button contracts as pieces peel away; short smooth connections disappear as pieces round into lenses. Panels dim over 2.4s from activation. Keep the existing 2.1s flights, acceleration/braking, destination row, gray icons and 0.4s settling. Hover light and flute drift resume after the final arrival. No navigation destinations are invented.
+
+
+## 2026-11-04 — Capsule ENTER, half-lit panels and flowing surface waves
+
+The owner requested the supplied glass capsule shape, 50% panel dimming during the word-to-button morph and animated shimmering waves. Use full semicircular ends (corner radius equal to half the button height) while retaining responsive button dimensions. During the 1.1s entry morph, smooth panel illumination from 1 to 0.5; hold 0.5 in waiting. ENTER activation fades the remaining half to zero over the existing 2.4s. Two broad travelling wave fields modify the large button's surface normals/refraction and soft cyan caustic light, with a shared frame-time uniform. Fade the effect out as splitting begins; keep small controls, hover spring and text shimmer unchanged. This supersedes fully illuminated waiting from the earlier gateway decision.
+
+
+## 2026-11-04 — Compact ENTER and hover-responsive contour glow
+
+The owner requested reducing ENTER about twofold and adding a light contour glow that strengthens on hover like the text. Halve both previous width and height, preserving the center and capsule proportions: desktop uses half the measured wordmark bounds; mobile uses up to 160x40px. Change the wordmark morph to monotonic 1-to-0.5 source contraction so letters visibly gather into the compact button. Add a subtle cyan contour plus narrow diffuse halo using the evolving distance field. A clamped hover/focus spring value increases this glow from 1x to 1.5x. Preserve waves, matte material, 50% waiting illumination and the click-triggered six-control sequence.
+
+
+## 2026-11-04 — Clickable wordmark instead of the capsule
+
+The owner rejected the capsule and requested labyla itself as the entry control, a dark shimmering ENTER hint inside it, and the former letter-to-bottom-controls animation on activation. Retain original wordmark size and responsive orientation (horizontal desktop, upright stacked mobile); there is no word-to-capsule morph or separate glass button surface. The existing 1.1s post-assembly phase now reveals the hint and dims panels to 50%. Keep native pointer/keyboard activation, hover/focus spring, contour glow and subtle glass waves on the letters. ENTER uses a dark, softly shimmering gradient; on mobile it follows the vertical layout. Restore the original glyph glass material rather than applying the removed capsule's extra frost/darkening.
+
+On activation, hide the hint and restore the six measured glyphs as animation sources, last-to-first with 100ms starts and the existing paths, compact lenses, late opening, gray icons and settling. Capture hover scale consistently for source contours and positions. Fade panels from 50% to zero over 2.4s. Preserve the loader, assembly, bottom control styling and ready-state interactions. Remove capsule geometry, section splitting, source-capture rectangle and obsolete capsule layout helper/test; no commit/push requested.
+
+
+## 2026-11-04 — Gradient ENTER behind the unchanged wordmark
+
+The owner requested retaining labyla while placing a slightly larger gradient ENTER behind it, stronger hover enlargement/glow and evaporation on activation. Keep the existing post-assembly 2.4s panel fade all the way to zero, without a 50% waiting stop. Keep the original labyla contour and size. Render ENTER as a separate rear layer at 112% of the wordmark bounds, with the existing cyan/deep-teal colors and animated gradient. Only rear ENTER enlarges with the hover/focus spring; add a bright diffuse cyan glow on hover. Native hit bounds follow the larger layer.
+
+On activation, dissolve/soften and raise the rear text over 0.55s while immediately starting the existing six-letter flights from labyla. Remove the currently present labyla-to-ENTER morph and the reverse preflight delay. Rear text is included in background sampling so the foreground glass refracts it. Preserve the current pointer-flow/flute interaction start, bottom controls, timing and icon styling.
+
+
+## 2026-11-04 — Lit ENTER contours and click-gated background
+
+The owner requested contour glow on the illuminated portions of gradient ENTER both idle and hovered, and background interaction only after activation. Add a narrow signed-distance rim weighted by the same moving gradient illumination; retain the existing diffuse halo and hover amplification. Gate pointer-flow injection and autonomous flute drift with the existing splitStart activation timestamp, replacing the reveal-completion timestamp. ENTER hover/focus visuals remain available while waiting; the background becomes interactive immediately on activation, not after the flights settle.
+
+
+## 2026-11-04 — Smooth ENTER, sequential reveal and button-driven flow
+
+The owner requested fixing rippled ENTER edges, delaying its appearance until panels are completely dark, enabling background cursor interaction after the button animation, and having moving buttons affect the background like the cursor. Rasterize ENTER directly at its final display dimensions, preserve smooth coverage and filter the distance-based glow. Begin the 1.1s reveal only after assembly plus the complete 2.4s fade. Enable cursor flow and autonomous flute drift at ready (2.6s flights plus 0.4s settling). During flights feed six independent button positions/velocities into the existing fluid simulation using the same brush behavior; leave their trails to advect and decay after landing. Keep tracking inactive cursor positions so activation does not create a spurious trail. This supersedes immediate click-gated background interaction.
+
+
+## 2026-11-04 — Faster pre-ENTER panel fade
+
+The owner clarified that faster fading applies to panels before ENTER, not fluid trails. Shorten the complete panel fade from 2.4s to 1.2s. ENTER still waits for the common zero endpoint before its existing 1.1s reveal. Button/cursor trail decay and subsequent choreography remain unchanged.
+
+
+## 2026-11-04 — First two buttons become page sections
+
+The owner defined each button as an information section and requested extending the first two flights: the first becomes the previous top menu, the second unfolds into an information block with its icon retained in the top-left corner. The owner confirmed a temporarily empty wide block beneath the menu and four remaining controls at the bottom. Keep their existing muted icons and shared matte-glass rendering. Restore the previous menu geometry: width up to 720px, height 56px, 22px corners and 20px top gap. The block starts at 104px from the top, is up to 960px wide and 420px high, and shrinks to fit above the bottom controls on short screens. Its icon inset equals the source button radius so the initial circle and expanded block share their top/left bounds.
+
+Preserve 100ms source starts and the existing first right/down arc. Extend the first two paths around the lower-left and up to their destinations over 3.2s each, then unfold over 0.85s with 0.4s final settling. The first home icon fades as the empty menu unfolds; the second icon stays at its arrival position while the block grows right/down. The other four flights keep their 2.1s duration and finish in a centered bottom row. Cursor injection and autonomous flute drift wait for the final expansion/settling (4.55s after ENTER). All moving sources keep driving the shared fluid field. No navigation behavior or content is added in this slice.

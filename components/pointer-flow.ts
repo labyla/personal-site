@@ -2,39 +2,43 @@
 // Shader Effects Inc., MIT; see docs/SHADERS_LICENSE.txt.
 // Keep simulation state separate from the texture upload so motion can be checked.
 export const FLOW_SIZE = 128;
+export type FlowSource = { x: number; y: number; active: boolean };
 
 export class PointerFlow {
   readonly pixels = new Uint8Array(FLOW_SIZE * FLOW_SIZE * 4);
   private field = new Float32Array(FLOW_SIZE * FLOW_SIZE * 3);
   private next = new Float32Array(this.field.length);
-  private previousX = 0.5;
-  private previousY = 0.5;
-  private velocityX = 0;
-  private velocityY = 0;
-  private initialized = false;
+  private sources: { x: number; y: number; vx: number; vy: number }[] = [];
   private maximum = 0;
 
   update(dt: number, x: number, y: number, active: boolean, aspect: number) {
+    return this.updateMany(dt, [{ x, y, active }], aspect);
+  }
+
+  // Source indices stay stable: one cursor and six independently moving buttons.
+  updateMany(dt: number, sources: readonly FlowSource[], aspect: number) {
     dt = Math.min(dt, 0.016);
     if (dt <= 0) return false;
-    if (!this.initialized || !active) {
-      this.previousX = x;
-      this.previousY = y;
-      this.initialized = true;
-    }
-    const vx = active ? (x - this.previousX) / dt : 0;
-    const vy = active ? (y - this.previousY) / dt : 0;
     const smoothing = 1 - Math.pow(0.85, dt / 0.016);
-    this.velocityX += (vx - this.velocityX) * smoothing;
-    this.velocityY += (vy - this.velocityY) * smoothing;
-    this.previousX = x;
-    this.previousY = y;
-    const injecting = Math.abs(vx) + Math.abs(vy) > 0.01;
-    if (!injecting && this.maximum < 0.0001) return false;
+    const brushes = [];
+    for (let i = 0; i < sources.length; i++) {
+      const { x, y, active } = sources[i];
+      const previous = this.sources[i] ?? { x, y, vx: 0, vy: 0 };
+      const vx = active ? (x - previous.x) / dt : 0;
+      const vy = active ? (y - previous.y) / dt : 0;
+      previous.vx += (vx - previous.vx) * smoothing;
+      previous.vy += (vy - previous.vy) * smoothing;
+      previous.x = x;
+      previous.y = y;
+      this.sources[i] = previous;
+      const speed = Math.hypot(previous.vx, previous.vy);
+      const radius = 3.5 * 0.05 * Math.min(speed * speed * 20, 1);
+      if (Math.abs(vx) + Math.abs(vy) > 0.01 && radius > 0) {
+        brushes.push({ x, y, vx: previous.vx, vy: previous.vy, speed, radiusSquared: radius * radius });
+      }
+    }
+    if (brushes.length === 0 && this.maximum < 0.0001) return false;
 
-    const speed = Math.hypot(this.velocityX, this.velocityY);
-    const radius = 3.5 * 0.05 * Math.min(speed * speed * 20, 1);
-    const radiusSquared = radius * radius;
     const fade = 1 - dt;
     const flowSpeed = 13 * 50 * dt;
     let maximum = 0;
@@ -54,15 +58,15 @@ export class PointerFlow {
         }
         let nextX = fx * fade, nextY = fy * fade;
         liquid *= fade;
-        if (injecting && radius > 0) {
-          const dx = ((col + 0.5) / FLOW_SIZE - x) * Math.max(1, aspect);
-          const dy = ((row + 0.5) / FLOW_SIZE - y) / Math.min(1, aspect);
+        for (const brush of brushes) {
+          const dx = ((col + 0.5) / FLOW_SIZE - brush.x) * Math.max(1, aspect);
+          const dy = ((row + 0.5) / FLOW_SIZE - brush.y) / Math.min(1, aspect);
           const distanceSquared = dx * dx + dy * dy;
-          if (distanceSquared < 4 * radiusSquared) {
-            const influence = Math.exp(-distanceSquared / radiusSquared) * dt;
-            nextX += this.velocityX * influence;
-            nextY += this.velocityY * influence;
-            liquid += influence * Math.min(speed * 10, 1);
+          if (distanceSquared < 4 * brush.radiusSquared) {
+            const influence = Math.exp(-distanceSquared / brush.radiusSquared) * dt;
+            nextX += brush.vx * influence;
+            nextY += brush.vy * influence;
+            liquid += influence * Math.min(brush.speed * 10, 1);
           }
         }
         this.next[index] = Math.max(-1, Math.min(1, nextX));

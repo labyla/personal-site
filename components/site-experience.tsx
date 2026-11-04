@@ -23,7 +23,7 @@ export function SiteExperience() {
   }, []);
 
   return (
-    <div className="site-experience" data-stage={stage} aria-busy={stage !== "ready"}>
+    <div className="site-experience" data-stage={stage} aria-busy={stage !== "ready" && stage !== "waiting"}>
       <GlassIntro readyToExit={pageReady} onStageChange={setStage} />
     </div>
   );
