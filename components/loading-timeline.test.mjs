@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { sectionLayout, sectionReveal, letterFlightArrival, letterFlightProgress, SECTION_FLIGHT_SECONDS, SECTION_UNFOLD_SECONDS, TRANSITION_SECONDS, ASSEMBLY_SECONDS, MORPH_SECONDS, BALL_BOUNCE_SECONDS, entryVaporProgress, ENTER_VAPOR_SECONDS, stepEnterHover, ENTER_REVEAL_SECONDS, ballTravel, ballBounce, letterShape, entryRevealProgress, ballLayout, letterBallPosition, LETTER_START_INTERVAL, MELT_ORDER, letterMeltWindow, letterMeltProgress, TRANSITION_FADE_SECONDS, transitionLight, LOADING_CYCLE_SECONDS, LOADING_MOTION_SECONDS, shouldFinishLoading } from "./loading-timeline.ts";
+import { sectionLayout, sectionReveal, letterFlightArrival, letterFlightProgress, SECTION_FLIGHT_SECONDS, SECTION_UNFOLD_SECONDS, TRANSITION_SECONDS, ASSEMBLY_SECONDS, MORPH_SECONDS, BALL_BOUNCE_SECONDS, entryVaporProgress, ENTER_VAPOR_SECONDS, stepEnterHover, ENTER_REVEAL_SECONDS, ballTravel, ballBounce, letterShape, entryRevealProgress, letterBallPosition, TRANSITION_FADE_SECONDS, transitionLight, LOADING_CYCLE_SECONDS, LOADING_MOTION_SECONDS, shouldFinishLoading } from "./loading-timeline.ts";
 import { acceleratingTravel, stripePosition } from "./stripe-motion.ts";
 
 test("fast readiness still waits for a full loading cycle", () => {
@@ -65,54 +65,44 @@ test("rear ENTER waits for full panel dimming before revealing", () => {
   assert.equal(entryVaporProgress(), 0);
 });
 
-test("letters start last-to-first, 100ms apart, and finish in arrival order", () => {
-  assert.deepEqual(MELT_ORDER, [5, 4, 3, 2, 1, 0]);
-  for (const [rank, index] of MELT_ORDER.entries()) {
-    const { start, end } = letterMeltWindow(index);
-    assert.ok(Math.abs(start * MORPH_SECONDS - rank * 0.1) < 1e-12);
-    assert.equal(letterMeltProgress(start, index), 0);
-    assert.equal(letterMeltProgress(end, index), 1);
-    assert.equal(letterMeltProgress(1, index), 1);
-  }
-  assert.ok(Math.abs(LETTER_START_INTERVAL * MORPH_SECONDS - 0.1) < 1e-12);
-  assert.equal(letterMeltWindow(0).end, 1);
+test("black-background mode reveals ENTER after loading without a hidden assembly wait", () => {
+  assert.equal(entryRevealProgress(0, false), 0);
+  assert.equal(entryRevealProgress(ENTER_REVEAL_SECONDS / 2, false), 0.5);
+  assert.equal(entryRevealProgress(ENTER_REVEAL_SECONDS, false), 1);
+  assert.equal(entryRevealProgress(ENTER_REVEAL_SECONDS, true), 0);
 });
 
-test("four bottom controls fit desktop and mobile, in arrival order", () => {
-  for (const [width, height] of [[1280, 720], [390, 844], [320, 568], [844, 390]]) {
-    const { radius } = ballLayout(width);
-    let previousRight = 0;
-    for (const index of MELT_ORDER.slice(2)) {
-      const start = { x: width * 0.5, y: height * 0.5 };
-      assert.deepEqual(letterBallPosition(0, index, start.x, start.y, width, height), start);
-      const end = letterBallPosition(1, index, start.x, start.y, width, height);
-      assert.ok(end.x - radius >= 16 - 1e-9 && end.x + radius <= width - 16 + 1e-9);
-      assert.ok(end.x - radius > previousRight);
-      assert.ok(Math.abs(end.y - radius - 24) < 1e-10);
-      previousRight = end.x + radius;
-      const turn = letterBallPosition(0.5, index, start.x, start.y, width, height);
-      assert.ok(turn.x > start.x && turn.y < start.y);
-      for (let n = 0; n <= 100; n++) {
-        const point = letterBallPosition(n / 100, index, start.x, start.y, width, height);
-        assert.ok(point.x >= radius && point.x <= width - radius);
-        assert.ok(point.y >= radius && point.y <= height - radius);
+test("six panels retain page insets in source order at desktop and mobile sizes", () => {
+  for (const [width, height, paddingX, paddingY] of [[1280,720,40,52.56], [960,720,32,52.56], [959,720,20,20], [1672,941,52.25,68.693], [390,844,20,20], [320,568,20,20], [844,390,20,20]]) {
+    const panels = sectionLayout(width, height);
+    assert.equal(panels.length, 6);
+    assert.ok(Math.abs(Math.min(...panels.map(p => p.x - p.width / 2)) - paddingX) < 1e-9);
+    assert.ok(Math.abs(Math.max(...panels.map(p => p.x + p.width / 2)) - (width - paddingX)) < 1e-9);
+    assert.ok(Math.abs(Math.min(...panels.map(p => p.y - p.height / 2)) - paddingY) < 1e-9);
+    assert.ok(Math.abs(Math.max(...panels.map(p => p.y + p.height / 2)) - (height - paddingY)) < 1e-9);
+    for (const [index, panel] of panels.entries()) {
+      assert.ok(panel.x - panel.width / 2 >= -1e-9);
+      assert.ok(panel.x + panel.width / 2 <= width + 1e-9);
+      assert.ok(panel.y - panel.height / 2 >= -1e-9);
+      assert.ok(panel.y + panel.height / 2 <= height + 1e-9);
+      if (width >= 960) {
+        assert.equal(panel.y, height / 2);
+        if (index) assert.ok(panel.x > panels[index - 1].x);
+      } else {
+        assert.equal(panel.x, width / 2);
+        if (index) assert.ok(panel.y < panels[index - 1].y);
       }
     }
   }
 });
 
 
-test("ball travel uses the stripes' cubic acceleration and mirrored braking without a hold", () => {
-  for (const t of [0, 0.1, 0.25, 0.49]) {
-    assert.ok(Math.abs(ballTravel(t) - acceleratingTravel(t * 2) * 0.5) < 1e-12);
-    assert.ok(Math.abs(ballTravel(1 - t) - (1 - ballTravel(t))) < 1e-12);
+test("short direct displacement retains cubic acceleration and mirrored braking", () => {
+  for(const t of [0,0.1,0.25,0.49]) {
+    assert.ok(Math.abs(ballTravel(t)-(t*2)**3*0.5)<1e-12);
+    assert.ok(Math.abs(ballTravel(1-t)-(1-ballTravel(t)))<1e-12);
   }
-  assert.equal(ballTravel(0), 0);
-  assert.equal(ballTravel(1), 1);
-  const speed = t => (ballTravel(t + 1e-5) - ballTravel(t - 1e-5)) / 2e-5;
-  assert.ok(Math.abs(speed(0.2) / speed(0.1) - 4) < 1e-5);
-  assert.ok(speed(0.8) > speed(0.9));
-  for (let i = 1; i < 100; i++) assert.ok(ballTravel(i / 100) > ballTravel((i - 1) / 100));
+  assert.equal(SECTION_FLIGHT_SECONDS,0.65);
 });
 
 test("lens opens with one short overshoot and a smaller rebound", () => {
@@ -126,22 +116,19 @@ test("lens opens with one short overshoot and a smaller rebound", () => {
   assert.equal(ballBounce(BALL_BOUNCE_SECONDS + 1), 0);
 });
 
-test("letters gather before opening; content resolves only near the final shape", () => {
-  assert.deepEqual(letterShape(0, -2.1), { gather: 0, open: 0, size: 1, icon: 0 });
+test("letters gather before opening and settle without icons", () => {
+  assert.deepEqual(letterShape(0, -2.1), { gather: 0, open: 0, size: 1 });
   for (const progress of [0.26, 0.4, 0.66]) {
     const shape = letterShape(progress, -1);
     assert.equal(shape.gather, 1);
     assert.equal(shape.open, 0);
-    assert.equal(shape.icon, 0);
   }
-  assert.equal(letterShape(0.86, -0.1).icon, 0);
   assert.ok(letterShape(0.94, -0.1).open > 0.9);
-  assert.ok(letterShape(0.94, -0.1).icon > 0);
   for (let n = 0; n <= 100; n++) {
     const shape = letterShape(1, n / 100 * BALL_BOUNCE_SECONDS);
     assert.ok(shape.size >= 0.98 && shape.size <= 1.12);
   }
-  assert.deepEqual(letterShape(1, BALL_BOUNCE_SECONDS), { gather: 1, open: 1, size: 1, icon: 1 });
+  assert.deepEqual(letterShape(1, BALL_BOUNCE_SECONDS), { gather: 1, open: 1, size: 1 });
 });
 
 test("rear ENTER evaporates smoothly after activation and stays absent", () => {
@@ -177,44 +164,61 @@ test("ENTER hover has a bounded jelly overshoot and settles on both enter and le
 });
 
 
-test("the first two controls continue to the menu and the block corner without leaving the viewport", () => {
-  for (const [width, height] of [[1280, 720], [390, 844], [320, 568], [844, 390]]) {
-    const { radius } = ballLayout(width);
-    const layout = sectionLayout(width, height);
-    assert.equal(layout.menu.width, Math.min(720, width - 32));
-    assert.equal(layout.menu.height, 56);
-    assert.equal(height - layout.menu.y - layout.menu.height / 2, 20);
-    assert.ok(layout.block.y + layout.block.height / 2 < layout.menu.y - layout.menu.height / 2);
-    assert.ok(Math.abs(layout.icon.x - radius - (layout.block.x - layout.block.width / 2)) < 1e-9);
-    assert.ok(Math.abs(layout.icon.y + radius - (layout.block.y + layout.block.height / 2)) < 1e-9);
-    for (const index of [5, 4]) {
-      const target = index === 5 ? layout.menu : layout.icon;
-      const end = letterBallPosition(1, index, width / 2, height / 2, width, height);
-      assert.ok(Math.hypot(end.x - target.x, end.y - target.y) < 1e-9);
-      for (let i = 0; i <= 200; i++) {
-        const point = letterBallPosition(i / 200, index, width / 2, height / 2, width, height);
-        assert.ok(point.x >= radius && point.x <= width - radius);
-        assert.ok(point.y >= radius && point.y <= height - radius);
+test("each drop reaches its own panel before that panel spreads", () => {
+  assert.equal(letterFlightArrival(5), SECTION_FLIGHT_SECONDS);
+  assert.ok(Math.abs(letterFlightArrival(0) - letterFlightArrival(5) - 0.2) < 1e-12);
+  for (let index = 0; index < 6; index++) {
+    const arrival = letterFlightArrival(index);
+    assert.equal(sectionReveal(arrival - 0.001, index), 0);
+    assert.equal(sectionReveal(arrival, index), 0);
+    assert.ok(Math.abs(sectionReveal(arrival + SECTION_UNFOLD_SECONDS / 2, index) - 0.5) < 1e-12);
+    assert.equal(sectionReveal(arrival + SECTION_UNFOLD_SECONDS + 0.001, index), 1);
+    assert.ok(TRANSITION_SECONDS >= arrival + SECTION_UNFOLD_SECONDS + BALL_BOUNCE_SECONDS - 1e-12);
+    assert.equal(letterFlightProgress((5 - index) * 0.04, index), 0);
+    assert.ok(letterFlightProgress((5 - index) * 0.04 + 0.1, index) > 0);
+  }
+});
+
+
+test("opening a panel preserves the overall extent and gaps while neighbours give way", () => {
+  for (const [width, height, expectedGap] of [[1280,720,15.36], [960,720,12], [959,720,10], [1672,941,20], [390,844,10], [320,568,10], [844,390,10]]) {
+    const vertical = width >= 960;
+    const neutral = sectionLayout(width, height);
+    for (let index = 0; index < 6; index++) {
+      const weights = Array(6).fill(1);
+      weights[index] = 2.6;
+      const open = sectionLayout(width, height, weights);
+      const axis = vertical ? "width" : "height";
+      assert.ok(open[index][axis] > neutral[index][axis]);
+      assert.ok(Math.abs(open.reduce((sum, p) => sum + p[axis], 0) - neutral.reduce((sum, p) => sum + p[axis], 0)) < 1e-9);
+      for (let i = 1; i < 6; i++) {
+        const gap = vertical ? open[i].x - open[i].width / 2 - open[i - 1].x - open[i - 1].width / 2
+          : open[i - 1].y - open[i - 1].height / 2 - open[i].y - open[i].height / 2;
+        assert.ok(Math.abs(gap - expectedGap) < 1e-9);
       }
     }
   }
 });
 
-test("sections unfold only after their flights and complete before background interaction", () => {
-  assert.equal(letterFlightArrival(5), SECTION_FLIGHT_SECONDS);
-  assert.ok(letterFlightArrival(4) > letterFlightArrival(5));
-  for (const index of [5, 4]) {
-    const arrival = letterFlightArrival(index);
-    assert.equal(letterFlightProgress(-1, index), 0);
-    assert.equal(letterFlightProgress(arrival, index), 1);
-    assert.equal(sectionReveal(arrival - 0.01, index), 0);
-    assert.equal(sectionReveal(arrival, index), 0);
-    assert.ok(Math.abs(sectionReveal(arrival + SECTION_UNFOLD_SECONDS / 2, index) - 0.5) < 1e-12);
-    assert.equal(sectionReveal(arrival + SECTION_UNFOLD_SECONDS + 0.001, index), 1);
-    assert.ok(TRANSITION_SECONDS >= arrival + SECTION_UNFOLD_SECONDS + BALL_BOUNCE_SECONDS - 1e-12);
-  }
-  for (const index of [3, 2, 1, 0]) {
-    assert.ok(Math.abs(letterFlightArrival(index) - letterMeltWindow(index).end * MORPH_SECONDS) < 1e-12);
-    assert.equal(letterFlightProgress(TRANSITION_SECONDS, index), 1);
+
+test("letters move only along the direct segment to their own panel centre", () => {
+  for (const [width, height] of [[1280,720], [390,844], [844,390]]) {
+    const panels = sectionLayout(width, height);
+    for (let index = 0; index < 6; index++) {
+      const start = { x: width / 2 + (index - 2.5) * 30, y: height / 2 };
+      const target = panels[index];
+      let previous = 0;
+      for (let n = 0; n <= 100; n++) {
+        const point = letterBallPosition(n / 100, index, start.x, start.y, width, height);
+        const dx = target.x - start.x, dy = target.y - start.y;
+        const distance = Math.hypot(point.x - start.x, point.y - start.y);
+        assert.ok(distance >= previous - 1e-9 && distance <= Math.hypot(dx, dy) + 1e-9);
+        assert.ok(Math.abs((point.x - start.x) * dy - (point.y - start.y) * dx) < 1e-8);
+        previous = distance;
+      }
+      assert.deepEqual(letterBallPosition(0, index, start.x, start.y, width, height), start);
+      const end = letterBallPosition(1, index, start.x, start.y, width, height);
+      assert.ok(Math.hypot(end.x - target.x, end.y - target.y) < 1e-9);
+    }
   }
 });

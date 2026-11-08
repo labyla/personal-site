@@ -22,6 +22,10 @@ import { STRIPE_COUNT, stripePosition } from "./stripe-motion";
 
 import { ASSEMBLY_SECONDS, MORPH_SECONDS, ballBounce, letterShape, entryVaporProgress, transitionLight, stepEnterHover, entryRevealProgress, ballLayout, letterBallPosition, SECTION_FLIGHT_SECONDS, SECTION_UNFOLD_SECONDS, TRANSITION_SECONDS, sectionLayout, sectionReveal, letterFlightProgress, letterFlightArrival, LOADING_CYCLE_SECONDS, LOADING_MOTION_SECONDS, shouldFinishLoading } from "./loading-timeline";
 
+// Temporarily disabled; retain the original fluted background and assembly path.
+const FLUTED_BACKGROUND_ENABLED = false;
+const PANEL_TITLES = ["ABOUT ME", "PROJECTS", "EXPERIENCE", "BLOG", "CONTACT", "MORE"];
+
 export type ExperienceStage = "loading" | "assembling" | "entering" | "waiting" | "melting" | "ready";
 
 export function GlassIntro({ readyToExit, onStageChange }: {
@@ -29,6 +33,7 @@ export function GlassIntro({ readyToExit, onStageChange }: {
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const enterRef = useRef<HTMLButtonElement>(null);
+  const accordionRef = useRef<HTMLElement>(null);
   const readyRef = useRef(readyToExit);
   const stageRef = useRef(onStageChange);
   useEffect(() => { readyRef.current = readyToExit; stageRef.current = onStageChange; }, [readyToExit, onStageChange]);
@@ -36,7 +41,12 @@ export function GlassIntro({ readyToExit, onStageChange }: {
   useEffect(() => {
     const host = hostRef.current;
     const enterButton = enterRef.current;
-    if (!host || !enterButton) return;
+    const accordion = accordionRef.current;
+    if (!host || !enterButton || !accordion) return;
+    const panelButtons = Array.from(accordion.querySelectorAll("button"));
+    const panelMotion = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const titleMeasure = document.createElement("canvas").getContext("2d")!;
+    const titleWidths = new Float32Array(6);
 
     const renderer = new WebGLRenderer({ antialias: true });
     const pixelRatio = Math.min(window.devicePixelRatio, 2);
@@ -63,6 +73,14 @@ export function GlassIntro({ readyToExit, onStageChange }: {
     const enterCanvas = document.createElement("canvas");
     const enterContext = enterCanvas.getContext("2d")!;
     const enterTexture = new CanvasTexture(enterCanvas);
+    // Five 320x480 reference photos, with bird repeated in the sixth atlas tile.
+    const photoCanvas = document.createElement("canvas");
+    photoCanvas.width = photoCanvas.height = 960;
+    const photoContext = photoCanvas.getContext("2d")!;
+    const photoTexture = new CanvasTexture(photoCanvas);
+    photoTexture.generateMipmaps = false;
+    photoTexture.minFilter = photoTexture.magFilter = LinearFilter;
+    const panelHover = new Float32Array(6);
     for (const dataTexture of [texture, surfaceTexture, enterTexture]) {
       dataTexture.generateMipmaps = false;
       dataTexture.minFilter = dataTexture.magFilter = LinearFilter;
@@ -72,9 +90,9 @@ export function GlassIntro({ readyToExit, onStageChange }: {
     const letterMotion = Array.from({ length: 6 }, () => new Vector4());
     const ballSquash = new Float32Array(6);
     const letterShapes = Array.from({ length: 6 }, () => new Vector4());
-    const iconReveal = new Float32Array(6);
-    const sectionRects = [new Vector4(), new Vector4()];
-    const sectionProgress = new Float32Array(2);
+    const panelRects = Array.from({ length: 6 }, () => new Vector4());
+    let activePanel: number | null = null;
+    const sectionProgress = new Float32Array(6);
     const entryBounds = new Vector4();
     const enterBounds = new Vector4();
     const entryBox = new Vector4();
@@ -168,13 +186,13 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       enterContext.setTransform(maskRatio, 0, 0, maskRatio, 0, 0);
       enterContext.fillStyle = "#000000";
       enterContext.fillRect(0, 0, width, height);
-      enterContext.font = '500 100px Arial';
+      enterContext.font = '400 100px Roph';
       const enterMetrics = enterContext.measureText("ENTER");
       const enterFont = vertical ? fontSize : Math.min(
         entry.width / enterMetrics.width * 100,
         entry.height / (enterMetrics.actualBoundingBoxAscent + enterMetrics.actualBoundingBoxDescent) * 100,
       );
-      enterContext.font = `500 ${enterFont}px Arial`;
+      enterContext.font = `400 ${enterFont}px Roph`;
       enterContext.fillStyle = enterContext.strokeStyle = "#ffffff";
       enterContext.lineJoin = "round";
       enterContext.lineWidth = enterFont * 0.055;
@@ -195,7 +213,7 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       // Rasterize vectors at their final display size instead of stretching the SDF.
       const sourceX = (enterLeft + enterRight) / 2;
       const sourceY = height - (enterBottom + enterTop) / 2;
-      const scaleX = entry.width * 1.12 / (enterRight - enterLeft);
+      const scaleX = entry.width * 1.2 / (enterRight - enterLeft);
       const scaleY = entry.height * 1.12 / (enterTop - enterBottom);
       enterContext.fillStyle = "#000000";
       enterContext.fillRect(0, 0, width, height);
@@ -205,7 +223,7 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       enterContext.fillStyle = "#ffffff";
       if (vertical) Array.from("ENTER").forEach((letter, i) => drawEnter(letter, height / 2 + (i - 2) * enterFont * 1.15));
       else drawEnter("ENTER", height / 2);
-      enterBounds.set(entry.x, entry.y, entry.width * 0.56, entry.height * 0.56);
+      enterBounds.set(entry.x, entry.y, entry.width * 0.6, entry.height * 0.56);
       roundedContext.clearRect(0, 0, canvas.width, canvas.height);
       roundedContext.filter = `blur(${0.6 * maskRatio}px)`;
       roundedContext.drawImage(enterCanvas, 0, 0);
@@ -224,6 +242,7 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       viewSize: { value: new Vector2(10, 7.3) },
       stripePositions: { value: new Float32Array(STRIPE_COUNT) },
       panelMode: { value: 0 },
+      flutedBackgroundEnabled: { value: Number(FLUTED_BACKGROUND_ENABLED) },
       panels: { value: panelTarget.texture },
       morph: { value: 0 },
       entryProgress: { value: 0 },
@@ -238,25 +257,31 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       letterMotion: { value: letterMotion },
       ballSquash: { value: ballSquash },
       letterShapes: { value: letterShapes },
-      iconReveal: { value: iconReveal },
-      sectionRects: { value: sectionRects },
+      panelRects: { value: panelRects },
       sectionProgress: { value: sectionProgress },
+      panelImages: { value: photoTexture },
+      panelHover: { value: panelHover },
+      panelMotion: { value: Number(panelMotion) },
+      panelRadius: { value: 22 },
     };
     const material = new ShaderMaterial({
       uniforms,
       vertexShader: `varying vec2 vUv;
         void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
       fragmentShader: `
-        uniform sampler2D wordmark, enterWordmark, surface, panels;
+        uniform sampler2D wordmark, enterWordmark, surface, panels, panelImages;
         uniform float panelMode, morph, ballRadius, entryProgress, entryVapor, surfaceTime, entryHover;
+        uniform float flutedBackgroundEnabled;
         uniform vec4 entryRect, enterSourceRect;
         uniform vec2 entryScale;
         uniform vec4 glyphBounds[6];
         uniform vec4 letterMotion[6];
-        uniform float ballSquash[6], iconReveal[6];
+        uniform float ballSquash[6];
         uniform vec4 letterShapes[6];
-        uniform vec4 sectionRects[2];
-        uniform float sectionProgress[2];
+        uniform vec4 panelRects[6];
+        uniform float sectionProgress[6];
+        uniform float panelHover[6];
+        uniform float panelMotion, panelRadius;
         uniform vec2 resolution, viewSize;
         uniform float stripePositions[${STRIPE_COUNT}];
         varying vec2 vUv;
@@ -278,7 +303,7 @@ export function GlassIntro({ readyToExit, onStageChange }: {
           vec2 p = uv * resolution;
           float vapor = entryVapor * entryVapor * (3.0 - 2.0 * entryVapor);
           vec2 local = p - entryRect.xy - vec2(sin(p.y * 0.03 + surfaceTime) * vapor * 5.0, vapor * 28.0);
-          vec2 target = entryRect.zw * 1.12 * entryScale;
+          vec2 target = entryRect.zw * vec2(1.2, 1.12) * entryScale;
           vec2 source = enterSourceRect.xy + local / target * enterSourceRect.zw;
           vec2 sampleUv = source / resolution;
           vec2 stepUv = vec2(0.75) / resolution;
@@ -304,11 +329,15 @@ export function GlassIntro({ readyToExit, onStageChange }: {
         }
 
         vec3 background(vec2 uv) {
-          if (panelMode > 0.5) return rearEnter(uv, texture2D(panels, uv).rgb);
+          if (panelMode > 0.5) {
+            vec3 base = vec3(0.0);
+            if (flutedBackgroundEnabled > 0.5) base = texture2D(panels, uv).rgb;
+            return rearEnter(uv, base);
+          }
           float along = dot((uv - 0.5) * viewSize, vec2(0.7071, -0.7071));
           float fade = smoothstep(-5.0, 5.0, along);
           vec3 tint = mix(vec3(0.0, 0.92, 0.95), vec3(0.005, 0.055, 0.10), fade);
-          return mix(vec3(0.00243), tint, stripes(uv));
+          return mix(vec3(0.0), tint, stripes(uv));
         }
 
         float sourceDistance(vec2 uv) {
@@ -316,36 +345,26 @@ export function GlassIntro({ readyToExit, onStageChange }: {
           return dot(packed, vec2(255.0, 255.0 / 256.0)) - 128.0;
         }
 
-        float segment(vec2 p, vec2 a, vec2 b) {
-          vec2 v = b - a;
-          return length(p - a - v * clamp(dot(p - a, v) / dot(v, v), 0.0, 1.0));
-        }
-
-        // Six temporary line icons: home, search, folder, heart, grid, envelope.
-        float iconDistance(vec2 p, int icon) {
-          if (icon == 0) return min(min(segment(p, vec2(-0.5, 0.0), vec2(0.0, 0.45)), segment(p, vec2(0.0, 0.45), vec2(0.5, 0.0))),
-            min(min(segment(p, vec2(-0.35, 0.1), vec2(-0.35, -0.4)), segment(p, vec2(0.35, 0.1), vec2(0.35, -0.4))), segment(p, vec2(-0.35, -0.4), vec2(0.35, -0.4))));
-          if (icon == 1) return min(abs(length(p - vec2(-0.1, 0.1)) - 0.32), segment(p, vec2(0.14, -0.14), vec2(0.46, -0.46)));
-          if (icon == 2) return min(abs(max(abs(p.x) - 0.48, abs(p.y + 0.08) - 0.3)), segment(p, vec2(-0.45, 0.38), vec2(-0.05, 0.38)));
-          if (icon == 3) {
-            p.x = abs(p.x);
-            return min(abs(length(p - vec2(0.22, 0.18)) - 0.24) + step(p.y, 0.12) * 2.0,
-              segment(p, vec2(0.45, 0.1), vec2(0.0, -0.46)));
-          }
-          if (icon == 4) return abs(max(abs(abs(p.x) - 0.27) - 0.16, abs(abs(p.y) - 0.27) - 0.16));
-          return min(abs(max(abs(p.x) - 0.5, abs(p.y) - 0.34)),
-            min(segment(p, vec2(-0.46, 0.28), vec2(0.0, -0.06)), segment(p, vec2(0.46, 0.28), vec2(0.0, -0.06))));
-        }
-
         float roundBox(vec2 p, vec2 halfSize, float radius) {
           vec2 q = abs(p) - halfSize + radius;
           return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - radius;
         }
 
+        vec3 panelPhoto(vec2 p, int index) {
+          vec4 panel = panelRects[index];
+          vec2 uv = (p - panel.xy) / (panel.zw * 2.0) + 0.5;
+          float aspect = panel.z / panel.w;
+          // Cover-fit the original 2:3 photographs without stretching them.
+          if (aspect > 0.666667) uv.y = (uv.y - 0.5) * 0.666667 / aspect + 0.5;
+          else uv.x = (uv.x - 0.5) * aspect / 0.666667 + 0.5;
+          uv = (uv - 0.5) / (1.0 + panelHover[index] * 0.045 * panelMotion) + 0.5;
+          uv = clamp(uv, vec2(0.5 / 320.0, 0.5 / 480.0), vec2(1.0 - 0.5 / 320.0, 1.0 - 0.5 / 480.0));
+          vec2 tile = vec2(mod(float(index), 3.0), 1.0 - floor(float(index) / 3.0));
+          return texture2D(panelImages, (tile + uv) / vec2(3.0, 2.0)).rgb;
+        }
+
         vec2 ballLocal(vec2 p, int index) {
           vec2 centre = letterMotion[index].yz;
-          if (index == 5) centre = mix(centre, sectionRects[0].xy, sectionProgress[0]);
-          if (index == 4) centre = mix(centre, sectionRects[1].xy, sectionProgress[1]);
           vec2 local = p - centre;
           float squash = 1.0 - ballSquash[index] * 0.14;
           local *= vec2(1.0 / squash, squash);
@@ -364,17 +383,35 @@ export function GlassIntro({ readyToExit, onStageChange }: {
           for (int i = 0; i < 6; i++) {
             vec4 bounds = glyphBounds[i];
             vec4 shape = letterShapes[i];
+            float spread = sectionProgress[i];
+            if (spread >= 1.0) {
+              vec4 panel = panelRects[i];
+              result = min(result, roundBox(p - panel.xy, panel.zw, min(panelRadius, min(panel.z, panel.w))));
+              continue;
+            }
             vec2 local = ballLocal(p, i) / shape.z;
             float sourceScale = mix(1.0, 0.55, shape.x);
             vec2 source = local / sourceScale;
             vec2 samplePoint = clamp(source, -bounds.zw, bounds.zw);
             float glyph = (sourceDistance((samplePoint + bounds.xy) / resolution) + length(source - samplePoint))
               * sourceScale;
-            float radius = mix(ballRadius * 0.58, ballRadius, shape.y);
+            float radius = mix(ballRadius * 0.58, ballRadius * 0.7, shape.y);
             float drop = length(local) - radius;
-            if (i == 5) drop = roundBox(local, mix(vec2(radius), sectionRects[0].zw, sectionProgress[0]), mix(radius, 22.0, sectionProgress[0]));
-            if (i == 4) drop = roundBox(local, mix(vec2(radius), sectionRects[1].zw, sectionProgress[1]), mix(radius, 22.0, sectionProgress[1]));
-            result = min(result, mix(glyph, drop, shape.x) * shape.z);
+            float sourceShape = mix(glyph, drop, shape.x) * shape.z;
+            if (spread <= 0.0) {
+              result = min(result, sourceShape);
+            } else {
+              vec4 panel = panelRects[i];
+              vec2 panelLocal = p - panel.xy;
+              // A rapid splash from the drop, then a slower liquid front and settling waves.
+              float expansion = 1.0 - pow(1.0 - spread, 3.0);
+              vec2 halfSize = mix(vec2(radius), panel.zw, expansion);
+              float wave = sin(spread * 18.0 - length(panelLocal) * 0.035)
+                * sin(atan(panelLocal.y, panelLocal.x) * 5.0 + spread * 9.0)
+                * 7.0 * sin(spread * 3.141593) * (1.0 - spread);
+              float liquidPanel = roundBox(panelLocal, halfSize, min(panelRadius, min(halfSize.x, halfSize.y))) + wave;
+              result = min(result, liquidPanel);
+            }
           }
           return result;
         }
@@ -446,6 +483,36 @@ export function GlassIntro({ readyToExit, onStageChange }: {
             float light = rim * (0.18 + 0.75 * lit) + rim * far * 0.22 + edge * 0.08;
             glass = clamp(glass * mix(1.08, 1.0, flying) + light * mix(vec3(1.0), vec3(0.035, 0.085, 0.09), flying)
               + vec3(0.020, 0.024, 0.026) * flying, 0.0, 1.0);
+            for (int i = 0; i < 6; i++) {
+              vec4 panel = panelRects[i];
+              vec2 local = p - panel.xy;
+              if (sectionProgress[i] > 0.0 && abs(local.x) <= panel.z && abs(local.y) <= panel.w) {
+                float hover = clamp(panelHover[i], 0.0, 1.0);
+                // The same two travelling surface waves used by the rear ENTER.
+                vec2 photoPoint = local / max(min(panel.z, panel.w), 100.0);
+                float photoPhase = photoPoint.x * 2.8 + photoPoint.y * 2.0 - surfaceTime * 0.75;
+                float photoCrossPhase = photoPoint.x * -1.7 + photoPoint.y * 2.8 - surfaceTime * 0.48;
+                vec2 photoSlope = vec2(2.8, 2.0) * cos(photoPhase) * 0.018
+                  + vec2(-1.7, 2.8) * cos(photoCrossPhase) * 0.012;
+                float bezel = min(17.0, min(panel.z, panel.w) * 0.20);
+                float border = 1.0 - smoothstep(0.0, bezel, -d);
+                vec3 photo = panelPhoto(p + photoSlope * hover * 65.0 * panelMotion + normal * border * 8.0, i);
+                float luminance = dot(photo, vec3(0.2126, 0.7152, 0.0722));
+                photo = mix(vec3(luminance), photo, mix(0.65, 0.98, hover)) * mix(0.46, 0.94, hover);
+                float photoWaveLight = pow(0.5 + 0.5 * sin(photoPhase), 3.0) * 0.65
+                  + pow(0.5 + 0.5 * sin(photoCrossPhase), 3.0) * 0.35;
+                photo += vec3(0.012, 0.038, 0.042) * photoWaveLight * hover * panelMotion;
+                float vertical = local.y / panel.w;
+                float topShade = smoothstep(0.15, 1.0, vertical) * 0.38;
+                float bottomShade = (1.0 - smoothstep(-1.0, -0.25, vertical)) * mix(0.88, 0.84, hover);
+                photo *= 1.0 - max(topShade, bottomShade);
+                // A broad refracting glass shoulder dissolves continuously into the photo.
+                vec3 shoulder = mix(glass, photo, 0.2) + vec3(0.045, 0.075, 0.08)
+                  * border * (0.4 + lit * 0.6);
+                vec3 imagePanel = mix(shoulder, photo, smoothstep(1.5, bezel, -d));
+                glass = mix(glass, imagePanel, smoothstep(0.02, 0.6, sectionProgress[i]));
+              }
+            }
             float aa = max(0.75, fwidth(distance) * 0.75);
             float coverage = entryProgress <= 0.0 ? texture2D(wordmark, vUv).r : 1.0 - smoothstep(-aa, aa, d);
             color = mix(color, glass, coverage);
@@ -453,15 +520,20 @@ export function GlassIntro({ readyToExit, onStageChange }: {
           float contourGlow = exp(-pow(d / 1.6, 2.0)) * 0.75
             + exp(-pow(d / 7.0, 2.0)) * 0.22;
           color += vec3(0.035, 0.085, 0.09) * contourGlow * entrySurface;
-          if (morph > 0.0) {
-            for (int i = 0; i < 6; i++) {
-              // Content resolves separately and stays crisp as the glass settles.
-              vec2 local = (p - letterMotion[i].yz) / (ballRadius * 0.74);
-              float softness = mix(0.14, 1.2 / ballRadius, iconReveal[i]);
-              float icon = 1.0 - smoothstep(0.035, 0.035 + softness, iconDistance(local, 5 - i));
-              float visibility = iconReveal[i];
-              if (i == 5) visibility *= 1.0 - sectionProgress[0];
-              color = mix(color, vec3(0.32), icon * visibility);
+          for (int i = 0; i < 6; i++) {
+            float reveal = smoothstep(0.85, 1.0, sectionProgress[i]);
+            if (reveal > 0.0) {
+              vec4 panel = panelRects[i];
+              vec2 local = (p - panel.xy) / panel.zw;
+              float panelDistance = roundBox(p - panel.xy, panel.zw, min(panelRadius, min(panel.z, panel.w)));
+              float hover = clamp(panelHover[i], 0.0, 1.0);
+              float shimmer = 0.5 + 0.5 * sin(local.x * 2.5 + local.y - surfaceTime * 0.75 * panelMotion + float(i) * 0.85);
+              vec3 tint = mix(vec3(0.005, 0.055, 0.10), vec3(0.0, 0.92, 0.95), shimmer);
+              float halo = exp(-abs(panelDistance) / mix(7.0, 24.0, hover));
+              float contour = 1.0 - smoothstep(0.45, 1.3, abs(panelDistance));
+              vec3 rimTint = mix(vec3(0.0, 0.35, 0.40), vec3(0.42, 1.0, 1.0), shimmer);
+              color += (tint * halo * (0.018 + hover * 0.24)
+                + rimTint * contour * (0.12 + hover * 0.80)) * reveal;
             }
           }
           gl_FragColor = vec4(color, 1.0);
@@ -491,6 +563,11 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       host.dataset.stage = next;
       enterButton.disabled = next !== "waiting";
       enterButton.setAttribute("aria-hidden", String(next !== "waiting"));
+      panelButtons.forEach((button) => {
+        button.disabled = next !== "ready";
+        button.setAttribute("aria-hidden", String(next !== "ready"));
+      });
+      accordion.setAttribute("aria-hidden", String(next !== "ready"));
       stageRef.current(next);
     };
     const requestEnter = () => {
@@ -504,6 +581,40 @@ export function GlassIntro({ readyToExit, onStageChange }: {
     enterButton.addEventListener("pointerleave", leaveEnter);
     enterButton.addEventListener("focus", hoverEnter);
     enterButton.addEventListener("blur", blurEnter);
+    const panelListeners = panelButtons.map((button, index) => {
+      const select = () => { if (stage === "ready") activePanel = index; };
+      const over = (event: PointerEvent) => { if (event.pointerType === "mouse") select(); };
+      const blur = (event: FocusEvent) => {
+        if (!accordion.contains(event.relatedTarget as Node | null)) activePanel = null;
+      };
+      const key = (event: KeyboardEvent) => {
+        const forward = event.key === "ArrowRight" || event.key === "ArrowDown";
+        const backward = event.key === "ArrowLeft" || event.key === "ArrowUp";
+        if (forward || backward) {
+          event.preventDefault();
+          panelButtons[(index + (forward ? 1 : 5)) % 6].focus();
+        } else if (event.key === "Escape") {
+          button.blur();
+          activePanel = null;
+        }
+      };
+      button.addEventListener("pointerenter", over);
+      button.addEventListener("focus", select);
+      button.addEventListener("click", select);
+      button.addEventListener("blur", blur);
+      button.addEventListener("keydown", key);
+      return () => {
+        button.removeEventListener("pointerenter", over);
+        button.removeEventListener("focus", select);
+        button.removeEventListener("click", select);
+        button.removeEventListener("blur", blur);
+        button.removeEventListener("keydown", key);
+      };
+    });
+    const leaveAccordion = () => {
+      if (!accordion.matches(":focus-within")) activePanel = null;
+    };
+    accordion.addEventListener("pointerleave", leaveAccordion);
     host.dataset.stage = "loading";
     const resize = new ResizeObserver(() => {
       const nextWidth = host.clientWidth, nextHeight = host.clientHeight;
@@ -519,10 +630,30 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       panelTarget.setSize(Math.round(width * pixelRatio), Math.round(height * pixelRatio));
       host.dataset.layout = width < 640 ? "vertical" : "horizontal";
       uniforms.ballRadius.value = ballLayout(width).radius;
+      const panelRadius = width >= 960 ? Math.min(28, Math.max(22, width * 0.017)) : 22;
+      uniforms.panelRadius.value = panelRadius;
+      accordion.style.setProperty("--panel-radius", `${panelRadius}px`);
       drawWordmark();
       prepared = false;
     });
-    resize.observe(host);
+    let disposed = false;
+    const photos = ["bird", "cow", "house", "man", "queue"].map((name) => {
+      const image = new Image();
+      image.src = `/images/accordion/${name}.jpg`;
+      return image.decode().then(() => image);
+    });
+    void Promise.all([document.fonts.load('400 100px Roph', "ENTER"), Promise.all(photos)]).then(([, images]) => {
+      if (disposed) return;
+      titleMeasure.font = "600 100px Arial";
+      PANEL_TITLES.forEach((title, index) => {
+        titleWidths[index] = Math.max(...title.split(" ").map((word) => titleMeasure.measureText(word).width));
+      });
+      [...images, images[0]].forEach((image, index) => {
+        photoContext.drawImage(image, index % 3 * 320, Math.floor(index / 3) * 480, 320, 480);
+      });
+      photoTexture.needsUpdate = true;
+      resize.observe(host);
+    });
     const move = (event: PointerEvent) => {
       const rect = host.getBoundingClientRect();
       panelMaterial.uniforms.pointer.value.set((event.clientX - rect.left) / rect.width, 1 - (event.clientY - rect.top) / rect.height);
@@ -535,10 +666,12 @@ export function GlassIntro({ readyToExit, onStageChange }: {
     renderer.setAnimationLoop((now) => {
       if (!glyphsReady) return;
       if (!prepared) {
-        // Upload textures and compile both paths before starting the visible clock.
-        renderer.setRenderTarget(panelTarget);
-        renderer.render(panelScene, camera);
-        renderer.setRenderTarget(null);
+        // Upload textures and compile active paths before starting the visible clock.
+        if (FLUTED_BACKGROUND_ENABLED) {
+          renderer.setRenderTarget(panelTarget);
+          renderer.render(panelScene, camera);
+          renderer.setRenderTarget(null);
+        }
         renderer.render(scene, camera);
         renderer.getContext().finish();
         prepared = true;
@@ -550,12 +683,12 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       const elapsed = (now - start) / 1000;
       if (stage === "loading" && shouldFinishLoading(previousElapsed, elapsed, readyRef.current)) {
         buildStart = now;
-        changeStage("assembling");
+        changeStage(FLUTED_BACKGROUND_ENABLED ? "assembling" : "entering");
       }
       if (buildStart !== undefined) {
         const buildTime = (now - buildStart) / 1000;
         if (stage === "assembling" && buildTime >= ASSEMBLY_SECONDS) changeStage("entering");
-        uniforms.entryProgress.value = entryRevealProgress(buildTime);
+        uniforms.entryProgress.value = entryRevealProgress(buildTime, FLUTED_BACKGROUND_ENABLED);
         if (stage === "entering" && uniforms.entryProgress.value >= 1) changeStage("waiting");
         if (enterRequested && splitStart === undefined) {
           splitStart = now;
@@ -574,7 +707,7 @@ export function GlassIntro({ readyToExit, onStageChange }: {
         uniforms.entryRect.value.copy(entryBox);
         enterButton.style.left = `${entryBox.x}px`;
         enterButton.style.top = `${height - entryBox.y}px`;
-        enterButton.style.width = `${entryBox.z * 2 * 1.12}px`;
+        enterButton.style.width = `${entryBox.z * 2 * 1.2}px`;
         enterButton.style.height = `${entryBox.w * 2 * 1.12}px`;
         enterButton.style.transform = `translate(-50%, -50%) scale(${sx}, ${sy})`;
         const sinceFlight = sinceActivation ?? 0;
@@ -582,18 +715,42 @@ export function GlassIntro({ readyToExit, onStageChange }: {
         panelMaterial.uniforms.assemblyLight.value = transitionLight(buildTime);
         uniforms.panelMode.value = 1;
         uniforms.morph.value = Math.min(1, sinceFlight / MORPH_SECONDS);
-        const sections = sectionLayout(width, height);
-        [sections.menu, sections.block].forEach((rect, index) => {
-          sectionRects[index].set(rect.x, rect.y, rect.width / 2, rect.height / 2);
-          sectionProgress[index] = splitStart === undefined ? 0 : sectionReveal(sinceFlight, 5 - index);
+        const easing = panelMotion ? 1 - Math.exp(-Math.min(dt, 0.1) * 7) : 1;
+        const weights = Array.from(panelHover, (value, index) => {
+          const target = Number(stage === "ready" && activePanel === index);
+          panelHover[index] = value + (target - value) * easing;
+          return 1 + panelHover[index] * 1.6;
         });
+        const sections = sectionLayout(width, height, weights);
+        for (let i = 0; i < 6; i++) {
+          const rect = sections[i];
+          panelRects[i].set(rect.x, rect.y, rect.width / 2, rect.height / 2);
+          const button = panelButtons[i];
+          button.style.left = `${rect.x - rect.width / 2}px`;
+          button.style.top = `${height - rect.y - rect.height / 2}px`;
+          button.style.width = `${rect.width}px`;
+          button.style.height = `${rect.height}px`;
+          button.setAttribute("aria-expanded", String(activePanel === i));
+          const open = panelHover[i];
+          const padding = width >= 960 ? Math.min(36, Math.max(18, width * 0.0215)) : 18;
+          const idleTitleSize = width >= 960 ? Math.min(32, width * 0.019) : 17;
+          const activeTitleSize = width >= 960 ? Math.min(64, rect.width * 0.125) : 32;
+          const bodyInset = padding;
+          const availableTitleWidth = rect.width - (width >= 960 ? bodyInset * 2 : 64);
+          const titleSize = Math.min(idleTitleSize + (activeTitleSize - idleTitleSize) * open,
+            availableTitleWidth / titleWidths[i] * 100);
+          button.style.setProperty("--panel-open", String(open));
+          button.style.setProperty("--panel-padding", `${padding}px`);
+          button.style.setProperty("--body-inset", `${bodyInset}px`);
+          button.style.setProperty("--title-size", `${titleSize}px`);
+          sectionProgress[i] = splitStart === undefined ? 0 : sectionReveal(sinceFlight, i);
+        }
         for (let i = 0; i < 6; i++) {
           const progress = letterFlightProgress(sinceFlight, i);
           const arrival = letterFlightArrival(i);
-          const sinceArrival = sinceFlight - arrival - (i >= 4 ? SECTION_UNFOLD_SECONDS : 0);
+          const sinceArrival = sinceFlight - arrival - SECTION_UNFOLD_SECONDS;
           ballSquash[i] = ballBounce(sinceArrival);
           const shape = letterShape(progress, sinceArrival);
-          iconReveal[i] = splitStart === undefined ? 0 : shape.icon;
           const bounds = glyphBounds[i];
           const x = bounds.x;
           const y = bounds.y;
@@ -601,7 +758,7 @@ export function GlassIntro({ readyToExit, onStageChange }: {
           const before = letterBallPosition(Math.max(0, progress - 0.001), i, x, y, width, height);
           const after = letterBallPosition(Math.min(1, progress + 0.001), i, x, y, width, height);
           const speed = Math.hypot(after.x - before.x, after.y - before.y)
-            / (0.002 * (i >= 4 ? SECTION_FLIGHT_SECONDS : MORPH_SECONDS - 0.5) * Math.max(width, height));
+            / (0.002 * SECTION_FLIGHT_SECONDS * Math.max(width, height));
           letterShapes[i].set(shape.gather, shape.open, shape.size, Math.min(0.24, speed * 0.16));
           letterMotion[i].set(progress, position.x, position.y, Math.atan2(after.y - before.y, after.x - before.x));
           flowSources[i + 1].x = position.x / width;
@@ -619,14 +776,14 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       flowSources[0].x = pointer.x;
       flowSources[0].y = pointer.y;
       flowSources[0].active = stage === "ready" && pointerInside;
-      if (flow.updateMany(dt, flowSources, width / height)) {
+      if (FLUTED_BACKGROUND_ENABLED && flow.updateMany(dt, flowSources, width / height)) {
         flowTexture.needsUpdate = true;
       }
       uniforms.surfaceTime.value = elapsed;
       panelMaterial.uniforms.time.value = elapsed;
       panelMaterial.uniforms.driftTime.value = splitStart === undefined ? 0
         : Math.max(0, (now - splitStart) / 1000 - TRANSITION_SECONDS);
-      if (buildStart !== undefined) {
+      if (FLUTED_BACKGROUND_ENABLED && buildStart !== undefined) {
         renderer.setRenderTarget(panelTarget);
         renderer.render(panelScene, camera);
         renderer.setRenderTarget(null);
@@ -636,7 +793,10 @@ export function GlassIntro({ readyToExit, onStageChange }: {
     });
 
     return () => {
+      disposed = true;
       resize.disconnect();
+      panelListeners.forEach((remove) => remove());
+      accordion.removeEventListener("pointerleave", leaveAccordion);
       enterButton.removeEventListener("click", requestEnter);
       enterButton.removeEventListener("pointerenter", hoverEnter);
       enterButton.removeEventListener("pointerleave", leaveEnter);
@@ -654,12 +814,30 @@ export function GlassIntro({ readyToExit, onStageChange }: {
       texture.dispose();
       enterTexture.dispose();
       surfaceTexture.dispose();
+      photoTexture.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     };
   }, []);
 
   return <div ref={hostRef} className="glass-intro">
+    <main ref={accordionRef} className="accordion-controls" aria-label="Основной контент" aria-hidden="true">
+      {PANEL_TITLES.map((title, index) => (
+        <button key={index} className="accordion-panel" type="button" disabled aria-hidden="true"
+          aria-label={`${String(index + 1).padStart(2, "0")} — ${title}`} aria-expanded="false">
+          <span className="panel-chrome" aria-hidden="true">
+            <span className="panel-number">{String(index + 1).padStart(2, "0")}</span>
+            <svg className="panel-arrow" viewBox="0 0 28 28" fill="none">
+              <path d="M6 22 22 6M7 6h15v15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" />
+            </svg>
+            <span className="panel-body">
+              <span className="panel-title">{title}</span>
+              <span className="panel-rule" />
+            </span>
+          </span>
+        </button>
+      ))}
+    </main>
     <button ref={enterRef} className="enter-button" type="button" disabled aria-hidden="true" aria-label="Enter site" />
   </div>;
 }
